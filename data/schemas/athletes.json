@@ -1,0 +1,13 @@
+[
+  {"name": "id", "type": "STRING", "mode": "REQUIRED", "description": "Unique row identifier"},
+  {"name": "height_cm", "type": "FLOAT", "mode": "NULLABLE", "description": "Athlete height in centimeters"},
+  {"name": "weight_kg", "type": "FLOAT", "mode": "NULLABLE", "description": "Athlete weight in kilograms"},
+  {"name": "sport", "type": "STRING", "mode": "REQUIRED", "description": "Sport name"},
+  {"name": "event", "type": "STRING", "mode": "NULLABLE", "description": "Specific event within sport"},
+  {"name": "year", "type": "INTEGER", "mode": "REQUIRED", "description": "Year of competition"},
+  {"name": "games_type", "type": "STRING", "mode": "REQUIRED", "description": "O for Olympic, P for Paralympic"},
+  {"name": "classification", "type": "STRING", "mode": "NULLABLE", "description": "Paralympic classification code if applicable"},
+  {"name": "sex", "type": "STRING", "mode": "NULLABLE", "description": "M or F"},
+  {"name": "age", "type": "INTEGER", "mode": "NULLABLE", "description": "Athlete age at time of competition"},
+  {"name": "era", "type": "STRING", "mode": "NULLABLE", "description": "Era bucket: pre-1950, 1950-1980, 1980-2000, 2000+"}
+]

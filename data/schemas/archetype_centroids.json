@@ -1,0 +1,12 @@
+[
+  {"name": "name", "type": "STRING", "mode": "REQUIRED", "description": "Archetype name"},
+  {"name": "description", "type": "STRING", "mode": "REQUIRED", "description": "Archetype description"},
+  {"name": "mean_height_cm", "type": "FLOAT", "mode": "REQUIRED"},
+  {"name": "mean_weight_kg", "type": "FLOAT", "mode": "REQUIRED"},
+  {"name": "mean_bmi", "type": "FLOAT", "mode": "REQUIRED"},
+  {"name": "std_height_cm", "type": "FLOAT", "mode": "NULLABLE"},
+  {"name": "std_weight_kg", "type": "FLOAT", "mode": "NULLABLE"},
+  {"name": "athlete_count", "type": "INTEGER", "mode": "NULLABLE"},
+  {"name": "sports_olympic", "type": "STRING", "mode": "REPEATED", "description": "Olympic sports in this archetype"},
+  {"name": "sports_paralympic", "type": "STRING", "mode": "REPEATED", "description": "Paralympic sports in this archetype"}
+]

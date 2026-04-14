@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Build
+frontend/dist/
+*.egg-info/
+
+# Environment
+.env
+*.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data sources (raw files)
+data/sources/*.csv
+data/sources/*.json
+!data/sources/.gitkeep
+
+# GCP credentials
+*.json
+!data/schemas/*.json
+!package.json
+!package-lock.json
+!tsconfig*.json
+
+# Logs
+*.log

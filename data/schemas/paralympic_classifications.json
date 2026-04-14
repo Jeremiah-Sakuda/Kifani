@@ -1,0 +1,7 @@
+[
+  {"name": "code", "type": "STRING", "mode": "REQUIRED", "description": "Classification code e.g. T44, S6"},
+  {"name": "sport", "type": "STRING", "mode": "REQUIRED", "description": "Sport this classification applies to"},
+  {"name": "description", "type": "STRING", "mode": "REQUIRED", "description": "Human-readable description"},
+  {"name": "impairment_type", "type": "STRING", "mode": "NULLABLE", "description": "Type of impairment"},
+  {"name": "events", "type": "STRING", "mode": "REPEATED", "description": "Events using this classification"}
+]
