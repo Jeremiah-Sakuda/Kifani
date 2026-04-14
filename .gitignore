@@ -23,10 +23,13 @@ frontend/dist/
 .DS_Store
 Thumbs.db
 
-# Data sources (raw files)
-data/sources/*.csv
+# Data sources (raw downloaded files — not our curated reference data)
+data/sources/athlete_events.csv
+data/sources/athletes_cleaned.csv
+data/sources/noc_regions.csv
 data/sources/*.json
 !data/sources/.gitkeep
+!data/sources/paralympic_classifications.csv
 
 # GCP credentials
 *.json
