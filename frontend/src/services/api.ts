@@ -67,4 +67,13 @@ export async function sendChatMessage(
   return res.data;
 }
 
+export type SessionResult = Omit<ArchetypeResult, "session_id">;
+
+export async function getSessionResult(
+  sessionId: string
+): Promise<SessionResult> {
+  const res = await api.get<SessionResult>(`/session/${sessionId}`);
+  return res.data;
+}
+
 export default api;

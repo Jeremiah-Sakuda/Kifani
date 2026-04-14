@@ -1,55 +1,54 @@
-import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { getSessionResult, type SessionResult } from "../services/api";
 import ArchetypeCard from "./ArchetypeCard";
 import DigitalMirror from "./DigitalMirror";
 import ChatInterface from "./ChatInterface";
 
-// TODO: Replace with actual data fetching from session
-const MOCK_RESULT = {
-  primary_archetype: {
-    name: "Explosive Mover",
-    description:
-      "Built for short, powerful bursts. Your frame suggests a body optimized for speed-to-power conversion — the kind of build that could dominate in sprint events, jumps, and explosive field sports.",
-    historical_context:
-      "This archetype has been a cornerstone of Team USA success since the 1936 Berlin Games, spanning both Olympic sprinters and Paralympic wheelchair racers.",
-    confidence: 0.87,
-  },
-  olympic_sports: [
-    { sport: "Track & Field", event: "100m / 200m Sprint", why: "Your power-to-weight ratio aligns with elite sprinter builds." },
-    { sport: "Track & Field", event: "Long Jump", why: "Explosive lower-body strength paired with your height is characteristic of top jumpers." },
-  ],
-  paralympic_sports: [
-    {
-      sport: "Para Athletics",
-      event: "T44 100m Sprint",
-      classification: "T44",
-      classification_explainer: "T44 covers athletes with below-knee limb deficiency or impairment affecting one or both legs. Athletes in this class compete with running prostheses.",
-      why: "The explosive build profile matches T44 sprinters who are among the fastest Paralympic athletes.",
-    },
-  ],
-  digital_mirror: {
-    user_position: [0.6, 0.7],
-    centroid_positions: {
-      Powerhouse: [0.9, 0.9],
-      "Aerobic Engine": [0.3, 0.2],
-      "Explosive Mover": [0.65, 0.75],
-      "Precision Athlete": [0.4, 0.5],
-      "Towering Reach": [0.5, 0.85],
-      "Compact Dynamo": [0.7, 0.3],
-    },
-    distribution_data: [],
-  },
-  narrative: "",
-};
-
 export default function Results() {
   const { sessionId } = useParams<{ sessionId: string }>();
+  const [result, setResult] = useState<SessionResult | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // TODO: Fetch actual result from backend using sessionId
-  const result = MOCK_RESULT;
+  useEffect(() => {
+    if (!sessionId) return;
+    getSessionResult(sessionId)
+      .then(setResult)
+      .catch(() => setError("Could not load results. Please try again."))
+      .finally(() => setLoading(false));
+  }, [sessionId]);
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="mb-4 h-12 w-12 mx-auto animate-spin rounded-full border-4 border-navy-mid border-t-gold" />
+          <p className="font-heading text-lg text-slate">Analyzing your build...</p>
+        </div>
+      </main>
+    );
+  }
+
+  if (error || !result) {
+    return (
+      <main className="flex min-h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="mb-4 text-lg text-red-usa">{error || "Something went wrong."}</p>
+          <Link to="/" className="font-heading text-gold underline">Try again</Link>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="mx-auto max-w-5xl px-6 py-16">
+      {/* Back link */}
+      <Link to="/" className="mb-8 inline-block font-heading text-sm text-slate hover:text-gold transition">
+        &larr; Start Over
+      </Link>
+
       {/* Archetype Header */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -63,6 +62,12 @@ export default function Results() {
         <h1 className="mb-4 text-5xl font-bold text-white md:text-6xl">
           {result.primary_archetype.name}
         </h1>
+        <div className="mx-auto mb-3 flex items-center justify-center gap-2">
+          <div className="h-1.5 rounded-full bg-gold" style={{ width: `${result.primary_archetype.confidence * 100}%`, maxWidth: "200px" }} />
+          <span className="font-heading text-xs text-slate">
+            {Math.round(result.primary_archetype.confidence * 100)}% match
+          </span>
+        </div>
         <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate">
           {result.primary_archetype.description}
         </p>
@@ -77,6 +82,20 @@ export default function Results() {
       >
         <DigitalMirror data={result.digital_mirror} />
       </motion.section>
+
+      {/* Narrative */}
+      {result.narrative && (
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="glass mb-16 rounded-2xl p-8"
+        >
+          <p className="text-lg leading-relaxed text-silver italic">
+            "{result.narrative}"
+          </p>
+        </motion.section>
+      )}
 
       {/* Sports — Olympic & Paralympic side by side */}
       <div className="mb-16 grid gap-8 md:grid-cols-2">
