@@ -6,6 +6,19 @@ import ArchetypeCard from "./ArchetypeCard";
 import DigitalMirror from "./DigitalMirror";
 import ChatInterface from "./ChatInterface";
 
+const stagger = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.12 },
+  },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 export default function Results() {
   const { sessionId } = useParams<{ sessionId: string }>();
   const [result, setResult] = useState<SessionResult | null>(null);
@@ -24,8 +37,8 @@ export default function Results() {
     return (
       <main className="flex min-h-screen items-center justify-center">
         <div className="text-center">
-          <div className="mb-4 h-12 w-12 mx-auto animate-spin rounded-full border-4 border-navy-mid border-t-gold" />
-          <p className="font-heading text-lg text-slate">Analyzing your build...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-navy-mid border-t-gold" />
+          <p className="font-heading text-lg text-slate">Loading results...</p>
         </div>
       </main>
     );
@@ -36,48 +49,84 @@ export default function Results() {
       <main className="flex min-h-screen items-center justify-center">
         <div className="text-center">
           <p className="mb-4 text-lg text-red-usa">{error || "Something went wrong."}</p>
-          <Link to="/" className="font-heading text-gold underline">Try again</Link>
+          <Link to="/" className="font-heading text-gold underline">
+            Try again
+          </Link>
         </div>
       </main>
     );
   }
 
+  const confidencePct = Math.round(result.primary_archetype.confidence * 100);
+
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
+    <main className="relative mx-auto max-w-5xl px-6 py-12">
+      {/* Background accents */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -right-40 top-20 h-[600px] w-[600px] rounded-full bg-gold/[0.03] blur-[140px]" />
+      </div>
+
       {/* Back link */}
-      <Link to="/" className="mb-8 inline-block font-heading text-sm text-slate hover:text-gold transition">
-        &larr; Start Over
-      </Link>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+        <Link
+          to="/"
+          className="mb-10 inline-flex items-center gap-2 font-heading text-sm text-slate transition hover:text-gold"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Start Over
+        </Link>
+      </motion.div>
 
       {/* Archetype Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="mb-12 text-center"
+        variants={stagger}
+        initial="hidden"
+        animate="show"
+        className="mb-14 text-center"
       >
-        <p className="mb-2 font-heading text-sm font-medium uppercase tracking-[0.2em] text-gold">
-          Your Archetype
-        </p>
-        <h1 className="mb-4 text-5xl font-bold text-white md:text-6xl">
+        <motion.div variants={fadeUp} className="mb-3 flex items-center justify-center gap-3">
+          <div className="h-px w-12 bg-gold/30" />
+          <p className="font-heading text-xs font-medium uppercase tracking-[0.25em] text-gold">
+            Your Archetype
+          </p>
+          <div className="h-px w-12 bg-gold/30" />
+        </motion.div>
+
+        <motion.h1 variants={fadeUp} className="mb-5 text-5xl font-bold text-white md:text-7xl">
           {result.primary_archetype.name}
-        </h1>
-        <div className="mx-auto mb-3 flex items-center justify-center gap-2">
-          <div className="h-1.5 rounded-full bg-gold" style={{ width: `${result.primary_archetype.confidence * 100}%`, maxWidth: "200px" }} />
-          <span className="font-heading text-xs text-slate">
-            {Math.round(result.primary_archetype.confidence * 100)}% match
-          </span>
-        </div>
-        <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate">
+        </motion.h1>
+
+        {/* Confidence meter */}
+        <motion.div variants={fadeUp} className="mx-auto mb-6 max-w-xs">
+          <div className="mb-1.5 flex justify-between">
+            <span className="font-heading text-xs text-slate">Match Confidence</span>
+            <span className="font-heading text-xs font-semibold text-gold">{confidencePct}%</span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-navy-mid">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-gold to-gold-bright"
+              initial={{ width: 0 }}
+              animate={{ width: `${confidencePct}%` }}
+              transition={{ duration: 1.2, delay: 0.3, ease: "easeOut" }}
+            />
+          </div>
+        </motion.div>
+
+        <motion.p
+          variants={fadeUp}
+          className="mx-auto max-w-2xl text-lg leading-relaxed text-slate"
+        >
           {result.primary_archetype.description}
-        </p>
+        </motion.p>
       </motion.div>
 
       {/* Digital Mirror */}
       <motion.section
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.2 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.3 }}
         className="mb-16"
       >
         <DigitalMirror data={result.digital_mirror} />
@@ -88,55 +137,66 @@ export default function Results() {
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="glass mb-16 rounded-2xl p-8"
+          transition={{ delay: 0.5 }}
+          className="glass relative mb-16 overflow-hidden rounded-2xl p-8"
         >
-          <p className="text-lg leading-relaxed text-silver italic">
-            "{result.narrative}"
+          <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-gold to-transparent" />
+          <p className="pl-4 text-lg leading-relaxed text-silver">
+            {result.narrative}
           </p>
         </motion.section>
       )}
 
       {/* Sports — Olympic & Paralympic side by side */}
-      <div className="mb-16 grid gap-8 md:grid-cols-2">
+      <div className="mb-16 grid gap-10 md:grid-cols-2">
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          transition={{ delayChildren: 0.6 }}
         >
-          <h2 className="mb-4 text-2xl font-bold text-white">
-            Olympic Sports
-          </h2>
+          <motion.div variants={fadeUp} className="mb-5 flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/10">
+              <span className="text-sm">O</span>
+            </div>
+            <h2 className="text-2xl font-bold text-white">Olympic Sports</h2>
+          </motion.div>
           <div className="space-y-4">
             {result.olympic_sports.map((s, i) => (
-              <ArchetypeCard
-                key={i}
-                sport={s.sport}
-                event={s.event}
-                why={s.why}
-              />
+              <motion.div key={i} variants={fadeUp}>
+                <ArchetypeCard
+                  sport={s.sport}
+                  event={s.event}
+                  why={s.why}
+                />
+              </motion.div>
             ))}
           </div>
         </motion.div>
 
         <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          variants={stagger}
+          initial="hidden"
+          animate="show"
+          transition={{ delayChildren: 0.7 }}
         >
-          <h2 className="mb-4 text-2xl font-bold text-white">
-            Paralympic Sports
-          </h2>
+          <motion.div variants={fadeUp} className="mb-5 flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gold/10">
+              <span className="text-sm">P</span>
+            </div>
+            <h2 className="text-2xl font-bold text-white">Paralympic Sports</h2>
+          </motion.div>
           <div className="space-y-4">
             {result.paralympic_sports.map((s, i) => (
-              <ArchetypeCard
-                key={i}
-                sport={s.sport}
-                event={s.event}
-                why={s.why}
-                classification={s.classification}
-                classificationExplainer={s.classification_explainer}
-              />
+              <motion.div key={i} variants={fadeUp}>
+                <ArchetypeCard
+                  sport={s.sport}
+                  event={s.event}
+                  why={s.why}
+                  classification={s.classification}
+                  classificationExplainer={s.classification_explainer}
+                />
+              </motion.div>
             ))}
           </div>
         </motion.div>
@@ -144,12 +204,12 @@ export default function Results() {
 
       {/* Historical Context */}
       <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
         className="glass mb-16 rounded-2xl p-8"
       >
-        <h2 className="mb-3 text-xl font-bold text-white">
+        <h2 className="mb-3 font-heading text-xl font-bold text-white">
           Historical Context
         </h2>
         <p className="leading-relaxed text-silver">
@@ -158,7 +218,13 @@ export default function Results() {
       </motion.section>
 
       {/* Chat */}
-      <ChatInterface sessionId={sessionId || ""} />
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.0 }}
+      >
+        <ChatInterface sessionId={sessionId || ""} />
+      </motion.div>
     </main>
   );
 }
