@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { generatePortrait } from "../services/api";
 
 interface Props {
   archetype: string;
@@ -7,7 +8,7 @@ interface Props {
   onReveal: () => void;
 }
 
-// Archetype-specific gradient themes for placeholder
+// Archetype-specific gradient themes
 const ARCHETYPE_THEMES: Record<string, { from: string; via: string; to: string }> = {
   Powerhouse: { from: "#8b0000", via: "#dc143c", to: "#ff6347" },
   "Aerobic Engine": { from: "#006400", via: "#228b22", to: "#90ee90" },
@@ -20,28 +21,55 @@ const ARCHETYPE_THEMES: Record<string, { from: string; via: string; to: string }
 };
 
 export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) {
-  const [state, setState] = useState<"loading" | "ready" | "revealed">("loading");
+  const [state, setState] = useState<"loading" | "ready" | "revealed" | "error">("loading");
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-
-  // sessionId and setImageUrl will be used when real Imagen API is connected
-  void sessionId;
-  void setImageUrl;
+  const [isPlaceholder, setIsPlaceholder] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const theme = ARCHETYPE_THEMES[archetype] || ARCHETYPE_THEMES.Powerhouse;
 
   useEffect(() => {
-    // Simulate Imagen generation (replace with real API call)
-    const timer = setTimeout(() => {
-      // For now, we don't have a real image, so we'll use the placeholder
-      setState("ready");
-    }, 2000);
+    let cancelled = false;
 
-    return () => clearTimeout(timer);
-  }, [sessionId]);
+    async function loadPortrait() {
+      try {
+        const result = await generatePortrait(archetype, sessionId);
+
+        if (cancelled) return;
+
+        if (result.success && result.image_data) {
+          setImageUrl(result.image_data);
+          setIsPlaceholder(result.is_placeholder || false);
+          setState("ready");
+        } else {
+          setError(result.error || "Failed to generate portrait");
+          setState("error");
+        }
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : "Failed to load portrait");
+        setState("error");
+      }
+    }
+
+    loadPortrait();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [archetype, sessionId]);
 
   const handleReveal = () => {
     setState("revealed");
     setTimeout(onReveal, 500);
+  };
+
+  const handleRetry = () => {
+    setState("loading");
+    setError(null);
+    // Re-trigger the effect by updating a dependency would require more state
+    // For simplicity, just reload
+    window.location.reload();
   };
 
   return (
@@ -82,7 +110,7 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
 
                 {/* Content */}
                 <div className="relative z-10 text-center">
-                  {state === "loading" ? (
+                  {state === "loading" && (
                     <>
                       <motion.div
                         className="mx-auto mb-6 h-20 w-20 rounded-full border-2 border-white/30"
@@ -96,10 +124,12 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
                         Generating your portrait...
                       </p>
                       <p className="mt-2 text-sm text-white/60">
-                        Powered by Imagen 4
+                        Powered by Imagen
                       </p>
                     </>
-                  ) : (
+                  )}
+
+                  {state === "ready" && (
                     <>
                       <motion.div
                         initial={{ scale: 0.8, opacity: 0 }}
@@ -125,12 +155,36 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
                       </motion.button>
                     </>
                   )}
+
+                  {state === "error" && (
+                    <>
+                      <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                        <svg className="h-10 w-10 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                      </div>
+                      <p className="mb-2 font-display text-lg text-white/90">
+                        Generation unavailable
+                      </p>
+                      <p className="mb-6 text-sm text-white/60">
+                        {error}
+                      </p>
+                      <motion.button
+                        onClick={handleRetry}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="rounded-full bg-white/20 px-6 py-2 text-sm font-medium text-white transition hover:bg-white/30"
+                      >
+                        Try Again
+                      </motion.button>
+                    </>
+                  )}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {/* Actual Portrait (placeholder for now) */}
+          {/* Actual Portrait */}
           <div
             className="absolute inset-0 flex items-center justify-center"
             style={{
@@ -141,11 +195,11 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
               <img
                 src={imageUrl}
                 alt={`${archetype} archetype portrait`}
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain"
               />
             ) : (
               <div className="text-center">
-                {/* Abstract archetype visualization */}
+                {/* Fallback abstract visualization */}
                 <motion.div
                   className="relative mx-auto mb-6 h-40 w-40"
                   animate={{ rotate: 360 }}
@@ -192,7 +246,9 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
       <p className="mt-6 text-center text-sm text-ash">
         A stylized representation of your athletic archetype.
         <br />
-        <span className="text-smoke">Non-photorealistic, powered by Imagen 4.</span>
+        <span className="text-smoke">
+          {isPlaceholder ? "Placeholder visualization" : "Non-photorealistic, powered by Imagen."}
+        </span>
       </p>
     </div>
   );

@@ -274,4 +274,30 @@ export async function analyzeVoice(
   return res.data;
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// IMAGEN API
+// ══════════════════════════════════════════════════════════════════════════════
+
+export interface ImagenResult {
+  success: boolean;
+  image_data?: string;  // Data URL with base64 image
+  mime_type?: string;
+  is_placeholder?: boolean;
+  error?: string;
+}
+
+/**
+ * Generate a stylized archetype portrait using Imagen.
+ */
+export async function generatePortrait(
+  archetype: string,
+  sessionId?: string
+): Promise<ImagenResult> {
+  const res = await api.post<ImagenResult>("/imagen/portrait", {
+    archetype,
+    session_id: sessionId,
+  });
+  return res.data;
+}
+
 export default api;

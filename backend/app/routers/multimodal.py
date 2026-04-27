@@ -19,6 +19,11 @@ from app.services.voice_analysis import (
     analyze_voice_base64,
     result_to_dict as voice_result_to_dict,
 )
+from app.services.imagen_service import (
+    generate_portrait,
+    generate_placeholder_svg,
+    result_to_dict as imagen_result_to_dict,
+)
 
 router = APIRouter()
 
@@ -178,3 +183,64 @@ def _mock_voice_response() -> dict:
         "clarification_needed": [],
         "requires_confirmation": False,
     }
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# IMAGEN PORTRAIT ENDPOINTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class ImagenRequest(BaseModel):
+    """Request for Imagen portrait generation."""
+    archetype: str
+    session_id: str | None = None
+
+
+@router.post("/imagen/portrait")
+async def generate_archetype_portrait(req: ImagenRequest):
+    """
+    Generate a stylized archetype portrait using Imagen.
+
+    Returns a non-photorealistic artistic representation of the archetype.
+    The image is an abstract, Olympic-poster-style visualization.
+    """
+    if DEV_MODE:
+        # Return SVG placeholder in dev mode
+        return {
+            "success": True,
+            "image_data": generate_placeholder_svg(req.archetype),
+            "mime_type": "image/svg+xml",
+            "is_placeholder": True,
+        }
+
+    try:
+        result = await generate_portrait(req.archetype, req.session_id)
+        response = imagen_result_to_dict(result)
+        response["is_placeholder"] = False
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/imagen/portrait/{archetype}")
+async def get_archetype_portrait(archetype: str, session_id: str | None = None):
+    """
+    Get or generate an archetype portrait.
+
+    GET version for easy embedding and caching.
+    """
+    if DEV_MODE:
+        return {
+            "success": True,
+            "image_data": generate_placeholder_svg(archetype),
+            "mime_type": "image/svg+xml",
+            "is_placeholder": True,
+        }
+
+    try:
+        result = await generate_portrait(archetype, session_id)
+        response = imagen_result_to_dict(result)
+        response["is_placeholder"] = False
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
