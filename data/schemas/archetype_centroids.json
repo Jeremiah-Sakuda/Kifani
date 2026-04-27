@@ -1,12 +1,15 @@
 [
   {"name": "name", "type": "STRING", "mode": "REQUIRED", "description": "Archetype name"},
   {"name": "description", "type": "STRING", "mode": "REQUIRED", "description": "Archetype description"},
-  {"name": "mean_height_cm", "type": "FLOAT", "mode": "REQUIRED"},
-  {"name": "mean_weight_kg", "type": "FLOAT", "mode": "REQUIRED"},
-  {"name": "mean_bmi", "type": "FLOAT", "mode": "REQUIRED"},
-  {"name": "std_height_cm", "type": "FLOAT", "mode": "NULLABLE"},
-  {"name": "std_weight_kg", "type": "FLOAT", "mode": "NULLABLE"},
-  {"name": "athlete_count", "type": "INTEGER", "mode": "NULLABLE"},
-  {"name": "sports_olympic", "type": "STRING", "mode": "REPEATED", "description": "Olympic sports in this archetype"},
-  {"name": "sports_paralympic", "type": "STRING", "mode": "REPEATED", "description": "Paralympic sports in this archetype"}
+  {"name": "historical_context", "type": "STRING", "mode": "REQUIRED", "description": "120-year historical narrative"},
+  {"name": "mean_height_cm", "type": "FLOAT", "mode": "REQUIRED", "description": "Centroid height in cm"},
+  {"name": "mean_weight_kg", "type": "FLOAT", "mode": "REQUIRED", "description": "Centroid weight in kg"},
+  {"name": "mean_bmi", "type": "FLOAT", "mode": "REQUIRED", "description": "Centroid BMI"},
+  {"name": "std_height_cm", "type": "FLOAT", "mode": "NULLABLE", "description": "Standard deviation of height"},
+  {"name": "std_weight_kg", "type": "FLOAT", "mode": "NULLABLE", "description": "Standard deviation of weight"},
+  {"name": "athlete_count", "type": "INTEGER", "mode": "NULLABLE", "description": "Number of athletes in cluster"},
+  {"name": "sample_weight", "type": "FLOAT", "mode": "NULLABLE", "description": "Weight for Paralympic parity (1.0 = Olympic, >1.0 = Paralympic weighted)"},
+  {"name": "sports_olympic", "type": "STRING", "mode": "REPEATED", "description": "Olympic sports aligned with this archetype"},
+  {"name": "sports_paralympic", "type": "STRING", "mode": "REPEATED", "description": "Paralympic sports aligned with this archetype"},
+  {"name": "is_paralympic_first", "type": "BOOLEAN", "mode": "NULLABLE", "description": "True if this archetype is Paralympic-first (no Olympic mappings)"}
 ]

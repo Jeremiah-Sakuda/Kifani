@@ -3,5 +3,7 @@ uvicorn[standard]==0.34.2
 google-cloud-aiplatform==1.90.0
 google-cloud-bigquery==3.31.0
 google-cloud-firestore==2.21.0
+google-genai==1.0.0
 pydantic==2.11.3
 python-dotenv==1.1.0
+sse-starlette==2.2.1
