@@ -11,6 +11,7 @@ import DigitalMirror from "./DigitalMirror";
 import SportCard from "./SportCard";
 import ChatInterface from "./ChatInterface";
 import MirrorReveal from "./MirrorReveal";
+import ConfidenceMeter from "./ConfidenceMeter";
 
 // Normalize streaming result to match expected format
 function normalizeResult(
@@ -111,7 +112,7 @@ export default function Results() {
     );
   }
 
-  const confidencePct = Math.round(result.primary_archetype.confidence * 100);
+  const confidence = result.primary_archetype.confidence;
 
   return (
     <main className="relative min-h-screen">
@@ -164,19 +165,8 @@ export default function Results() {
           </motion.h1>
 
           {/* Confidence Meter */}
-          <motion.div variants={fadeUp} className="mx-auto mb-8 max-w-sm">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="text-xs uppercase tracking-wider text-ash">Match Confidence</span>
-              <span className="font-mono text-sm font-semibold text-gold-core">{confidencePct}%</span>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-forge-steel">
-              <motion.div
-                className="h-full rounded-full bg-gradient-to-r from-gold-deep via-gold-core to-gold-bright"
-                initial={{ width: 0 }}
-                animate={{ width: `${confidencePct}%` }}
-                transition={{ duration: 1.2, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              />
-            </div>
+          <motion.div variants={fadeUp} className="mx-auto mb-8 max-w-md">
+            <ConfidenceMeter confidence={confidence} showExplanation />
           </motion.div>
 
           {/* Description */}

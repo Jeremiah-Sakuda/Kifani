@@ -10,6 +10,10 @@ from typing import Any
 
 from app.models.archetypes import ARCHETYPES, get_archetype_by_name
 from app.services.clustering import compute_archetype_match, format_sport_matches
+from app.services.conditional_language import (
+    enrich_match_result_with_language,
+    get_confidence_aware_prompt_injection,
+)
 from app.models.schemas import MatchRequest
 
 
@@ -71,7 +75,7 @@ def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
                 "is_paralympic_first": len(arch.sports_olympic) == 0,
             })
 
-    return {
+    base_result = {
         "primary_archetype": {
             "name": archetype.name,
             "description": archetype.description,
@@ -89,6 +93,16 @@ def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
         },
         "centroid_positions": result["centroid_positions"],
     }
+
+    # Enrich with confidence-aware language context
+    enriched_result = enrich_match_result_with_language(base_result)
+
+    # Add prompt injection for Gemini
+    enriched_result["language_guidance"] = get_confidence_aware_prompt_injection(
+        confidence
+    )
+
+    return enriched_result
 
 
 # Tool metadata for ADK registration
