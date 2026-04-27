@@ -135,14 +135,31 @@ export default function Processing() {
           </div>
         </motion.div>
 
-        {/* Error Message */}
+        {/* Error Message with Retry */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-8 rounded-lg bg-ember-glow/10 px-4 py-3 text-center text-sm text-ember-bright"
+            className="mb-8 rounded-lg bg-ember-glow/10 px-4 py-3 text-center"
           >
-            {error}
+            <p className="mb-3 text-sm text-ember-bright">{error}</p>
+            <div className="flex justify-center gap-3">
+              <button
+                onClick={() => {
+                  hasStartedRef.current = false;
+                  if (formData) startStream(formData);
+                }}
+                className="rounded-lg bg-ember-glow/20 px-4 py-2 text-sm font-medium text-ember-bright transition hover:bg-ember-glow/30"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => navigate("/")}
+                className="rounded-lg bg-forge-steel px-4 py-2 text-sm font-medium text-smoke transition hover:bg-forge-graphite"
+              >
+                Start Over
+              </button>
+            </div>
           </motion.div>
         )}
 
