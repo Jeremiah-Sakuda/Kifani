@@ -64,6 +64,7 @@ export default function Results() {
     if (!sessionId) return;
 
     async function fetchResult() {
+      if (!sessionId) return;
       try {
         // Try streaming session endpoint first (new flow)
         const streamResult = await getStreamSessionResult(sessionId);
