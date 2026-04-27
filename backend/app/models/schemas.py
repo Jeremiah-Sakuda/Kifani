@@ -47,3 +47,41 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     sources: list[str] | None = None
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STREAMING SCHEMAS
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class StreamMatchRequest(BaseModel):
+    """Request body for streaming match endpoint."""
+    height_cm: float = Field(..., gt=0, description="Height in centimeters")
+    weight_kg: float = Field(..., gt=0, description="Weight in kilograms")
+    arm_span_cm: float | None = Field(None, gt=0, description="Arm span in centimeters")
+    activity_preferences: list[str] | None = Field(None, description="Activity preferences")
+
+
+class StreamChatRequest(BaseModel):
+    """Request body for streaming chat endpoint."""
+    session_id: str
+    message: str
+
+
+class RankedArchetype(BaseModel):
+    """Archetype in ranked list."""
+    name: str
+    match_strength: float
+    description: str
+    is_paralympic_first: bool = False
+
+
+class StreamSessionResponse(BaseModel):
+    """Response from stream session endpoint."""
+    session_id: str
+    primary_archetype: dict
+    ranked_archetypes: list[RankedArchetype] = []
+    sport_alignments: dict = {}
+    user_metrics: dict = {}
+    centroid_positions: dict = {}
+    narrative: str = ""
