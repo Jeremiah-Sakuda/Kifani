@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import InputModeSelector from "./InputModeSelector";
 import PhotoInput, { type PrefillData } from "./PhotoInput";
 import VoiceInput from "./VoiceInput";
 import FormInput from "./FormInput";
+import ArchetypePreview from "./ArchetypePreview";
 
 type InputMode = "photo" | "voice" | "form";
 
@@ -15,13 +17,35 @@ const EMBER_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
   size: 2 + Math.random() * 3,
 }));
 
+// Demo profiles for quick testing
+const DEMO_PROFILES = [
+  { name: "Swimmer Build", height_cm: 193, weight_kg: 88, arm_span_cm: 201 },
+  { name: "Gymnast Build", height_cm: 157, weight_kg: 52 },
+  { name: "Powerlifter Build", height_cm: 175, weight_kg: 105 },
+  { name: "Runner Build", height_cm: 178, weight_kg: 62 },
+];
+
 export default function Landing() {
-  const [inputMode, setInputMode] = useState<InputMode>("photo");
+  const navigate = useNavigate();
+  const [inputMode, setInputMode] = useState<InputMode>("form");
   const [prefillData, setPrefillData] = useState<PrefillData | undefined>();
+  const [showDemoOptions, setShowDemoOptions] = useState(false);
 
   const handleFallbackToForm = (data?: PrefillData) => {
     setPrefillData(data);
     setInputMode("form");
+  };
+
+  const handleDemo = (profile: typeof DEMO_PROFILES[0]) => {
+    navigate("/processing", {
+      state: {
+        formData: {
+          height_cm: profile.height_cm,
+          weight_kg: profile.weight_kg,
+          arm_span_cm: profile.arm_span_cm,
+        },
+      },
+    });
   };
 
   return (
@@ -173,6 +197,67 @@ export default function Landing() {
             </motion.div>
           )}
         </AnimatePresence>
+      </motion.div>
+
+      {/* Demo Mode */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.2 }}
+        className="relative z-10 mt-8"
+      >
+        <button
+          onClick={() => setShowDemoOptions(!showDemoOptions)}
+          className="flex items-center gap-2 text-sm text-ash transition hover:text-gold-core"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+          </svg>
+          Try a demo profile
+          <motion.svg
+            className="h-3 w-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+            animate={{ rotate: showDemoOptions ? 180 : 0 }}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </motion.svg>
+        </button>
+
+        <AnimatePresence>
+          {showDemoOptions && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 flex flex-wrap justify-center gap-2"
+            >
+              {DEMO_PROFILES.map((profile) => (
+                <motion.button
+                  key={profile.name}
+                  onClick={() => handleDemo(profile)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="rounded-lg bg-forge-steel/50 px-3 py-2 text-sm text-smoke transition hover:bg-forge-steel hover:text-white"
+                >
+                  {profile.name}
+                </motion.button>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+
+      {/* Archetype Preview Carousel */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="relative z-10 mt-16 w-full"
+      >
+        <ArchetypePreview />
       </motion.div>
 
       {/* Bottom Gradient Fade */}
