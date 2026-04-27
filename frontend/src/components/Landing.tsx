@@ -1,87 +1,180 @@
-import { motion } from "framer-motion";
-import InputForm from "./InputForm";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import InputModeSelector from "./InputModeSelector";
+import PhotoInput from "./PhotoInput";
+import VoiceInput from "./VoiceInput";
+import FormInput from "./FormInput";
 
-const RINGS = [280, 400, 540];
+type InputMode = "photo" | "voice" | "form";
+
+const EMBER_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  delay: Math.random() * 3,
+  duration: 2 + Math.random() * 2,
+  size: 2 + Math.random() * 3,
+}));
 
 export default function Landing() {
+  const [inputMode, setInputMode] = useState<InputMode>("photo");
+
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6">
-      {/* Background gradient orbs */}
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16">
+      {/* Atmospheric Background */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-1/4 top-1/4 h-[500px] w-[500px] rounded-full bg-gold/5 blur-[120px]" />
-        <div className="absolute bottom-1/3 right-1/3 h-[400px] w-[400px] rounded-full bg-red-usa/5 blur-[100px]" />
+        {/* Ember gradient at bottom */}
+        <div className="absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t from-ember-deep/40 via-forge-charcoal/0 to-transparent" />
+
+        {/* Gold radial glow behind content */}
+        <div className="absolute left-1/2 top-1/2 h-[800px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-radial from-gold-core/[0.04] via-transparent to-transparent" />
+
+        {/* Subtle ember accent */}
+        <div className="absolute -left-40 top-1/3 h-[500px] w-[500px] rounded-full bg-ember-glow/[0.03] blur-[120px]" />
       </div>
 
-      {/* Concentric rings behind the form */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        {RINGS.map((size, i) => (
+      {/* Floating ember particles */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        {EMBER_PARTICLES.map((p) => (
           <motion.div
-            key={size}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1.2, delay: 0.5 + i * 0.2, ease: "easeOut" }}
-            className="absolute rounded-full border border-gold/[0.04]"
-            style={{ width: size, height: size }}
+            key={p.id}
+            className="absolute rounded-full bg-ember-bright"
+            style={{
+              left: `${p.x}%`,
+              bottom: -10,
+              width: p.size,
+              height: p.size,
+            }}
+            animate={{
+              y: [-10, -150],
+              opacity: [0, 1, 0],
+              scale: [1, 0.5],
+            }}
+            transition={{
+              duration: p.duration,
+              delay: p.delay,
+              repeat: Infinity,
+              ease: "easeOut",
+            }}
           />
         ))}
       </div>
 
-      {/* Header content */}
+      {/* Header Content */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="relative z-10 flex max-w-2xl flex-col items-center text-center"
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="relative z-10 mb-12 flex max-w-3xl flex-col items-center text-center"
       >
+        {/* Tagline */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1, duration: 0.5 }}
-          className="mb-6 flex items-center gap-2"
-        >
-          <div className="h-px w-8 bg-gold/40" />
-          <p className="font-heading text-xs font-medium uppercase tracking-[0.25em] text-gold">
-            Team USA Athlete Archetype Agent
-          </p>
-          <div className="h-px w-8 bg-gold/40" />
-        </motion.div>
-
-        <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.7 }}
-          className="mb-6 text-5xl font-bold leading-[1.1] text-white md:text-7xl"
+          transition={{ delay: 0.2, duration: 0.8 }}
+          className="mb-8 flex items-center gap-4"
         >
-          Find Your{" "}
-          <span className="glow-text bg-gradient-to-r from-gold to-gold-bright bg-clip-text text-transparent">
-            Archetype
+          <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold-core/60" />
+          <span className="font-mono text-xs font-medium uppercase tracking-[0.3em] text-gold-core">
+            120 Years of Team USA
+          </span>
+          <div className="h-px w-12 bg-gradient-to-l from-transparent to-gold-core/60" />
+        </motion.div>
+
+        {/* Main Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.9 }}
+          className="mb-6"
+        >
+          <span className="block font-display text-6xl text-white md:text-8xl">
+            FORGED
           </span>
         </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+          className="mb-4 max-w-xl font-display text-xl italic text-silver md:text-2xl"
+        >
+          See yourself in 120 years of Olympic &amp; Paralympic history
+        </motion.p>
 
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="mb-12 max-w-lg text-lg leading-relaxed text-slate"
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="max-w-lg text-base leading-relaxed text-smoke"
         >
-          Enter your physical traits and discover which Team USA athletes
-          — Olympic and Paralympic — share your build.{" "}
-          <span className="text-silver">120 years of history, one personal result.</span>
+          Every fan carries a body with history. Discover which Team USA athletes
+          share your build — powered by Gemini.
         </motion.p>
       </motion.div>
 
-      {/* Form */}
+      {/* Input Mode Selector */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7, duration: 0.8 }}
+        className="relative z-10 mb-8"
+      >
+        <InputModeSelector activeMode={inputMode} onModeChange={setInputMode} />
+      </motion.div>
+
+      {/* Input Forms */}
       <motion.div
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.5, ease: "easeOut" }}
+        transition={{ delay: 0.8, duration: 0.8 }}
         className="relative z-10 w-full max-w-lg"
       >
-        <InputForm />
+        <AnimatePresence mode="wait">
+          {inputMode === "photo" && (
+            <motion.div
+              key="photo"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <PhotoInput onFallback={() => setInputMode("form")} />
+            </motion.div>
+          )}
+
+          {inputMode === "voice" && (
+            <motion.div
+              key="voice"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <VoiceInput onFallback={() => setInputMode("form")} />
+            </motion.div>
+          )}
+
+          {inputMode === "form" && (
+            <motion.div
+              key="form"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FormInput />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
 
-      {/* Bottom fade */}
-      <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-navy to-transparent" />
+      {/* Bottom Gradient Fade */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-forge-black to-transparent" />
+
+      {/* Decorative Lines */}
+      <div className="pointer-events-none absolute left-8 top-1/4 hidden h-32 w-px bg-gradient-to-b from-transparent via-gold-core/20 to-transparent lg:block" />
+      <div className="pointer-events-none absolute right-8 top-1/3 hidden h-24 w-px bg-gradient-to-b from-transparent via-ember-glow/20 to-transparent lg:block" />
     </main>
   );
 }
