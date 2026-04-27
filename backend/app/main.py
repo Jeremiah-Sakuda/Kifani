@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers import match, chat, stream
+from app.routers import match, chat, stream, multimodal
 
 load_dotenv()
 
@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(match.router, prefix="/api")
 app.include_router(chat.router, prefix="/api")
 app.include_router(stream.router, prefix="/api")
+app.include_router(multimodal.router, prefix="/api")
 
 
 @app.get("/health")

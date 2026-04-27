@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import type { PrefillData } from "./PhotoInput";
 
 const ACTIVITY_OPTIONS = [
   { id: "strength", label: "Strength", icon: "💪" },
@@ -19,7 +20,29 @@ const AGE_RANGES = [
   { value: "46+", label: "46+" },
 ];
 
-export default function FormInput() {
+// Convert cm to feet and inches
+function cmToFtIn(cm: number): { ft: string; inches: string } {
+  const totalInches = cm / 2.54;
+  const ft = Math.floor(totalInches / 12);
+  const inches = Math.round(totalInches % 12);
+  return { ft: ft.toString(), inches: inches.toString() };
+}
+
+// Convert kg to lbs
+function kgToLbs(kg: number): string {
+  return Math.round(kg / 0.453592).toString();
+}
+
+// Convert cm to inches
+function cmToIn(cm: number): string {
+  return Math.round(cm / 2.54).toString();
+}
+
+interface Props {
+  prefillData?: PrefillData;
+}
+
+export default function FormInput({ prefillData }: Props) {
   const navigate = useNavigate();
 
   const [heightFt, setHeightFt] = useState("");
@@ -29,6 +52,28 @@ export default function FormInput() {
   const [ageRange, setAgeRange] = useState("");
   const [activities, setActivities] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [showPrefillNote, setShowPrefillNote] = useState(false);
+
+  // Apply prefill data when it changes
+  useEffect(() => {
+    if (prefillData) {
+      if (prefillData.height_cm) {
+        const { ft, inches } = cmToFtIn(prefillData.height_cm);
+        setHeightFt(ft);
+        setHeightIn(inches);
+      }
+      if (prefillData.weight_kg) {
+        setWeightLbs(kgToLbs(prefillData.weight_kg));
+      }
+      if (prefillData.arm_span_cm) {
+        setArmSpanIn(cmToIn(prefillData.arm_span_cm));
+      }
+      if (prefillData.activity_preferences) {
+        setActivities(prefillData.activity_preferences);
+      }
+      setShowPrefillNote(true);
+    }
+  }, [prefillData]);
 
   function toggleActivity(id: string) {
     setActivities((prev) =>
@@ -73,6 +118,31 @@ export default function FormInput() {
         <h2 className="mb-2 font-display text-xl text-white">Physical Traits</h2>
         <p className="text-sm text-smoke">Enter your measurements for archetype matching</p>
       </div>
+
+      {/* Prefill Note */}
+      {showPrefillNote && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 flex items-center gap-3 rounded-lg bg-gold-core/10 px-4 py-3"
+        >
+          <svg className="h-5 w-5 shrink-0 text-gold-core" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p className="text-sm text-gold-core">
+            Values pre-filled from analysis. Please review and adjust if needed.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowPrefillNote(false)}
+            className="ml-auto text-gold-core/60 transition hover:text-gold-core"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </motion.div>
+      )}
 
       {/* Height */}
       <div className="mb-6">

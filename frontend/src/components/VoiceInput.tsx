@@ -1,16 +1,20 @@
-import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { analyzeVoice, type VoiceAnalysisResult } from "../services/api";
+import type { PrefillData } from "./PhotoInput";
 
 interface Props {
-  onFallback: () => void;
+  onFallback: (prefillData?: PrefillData) => void;
 }
 
 export default function VoiceInput({ onFallback }: Props) {
+  const navigate = useNavigate();
   const [isRecording, setIsRecording] = useState(false);
   const [recordingTime, setRecordingTime] = useState(0);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
-  const [transcript, setTranscript] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [result, setResult] = useState<VoiceAnalysisResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -30,7 +34,11 @@ export default function VoiceInput({ onFallback }: Props) {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("audio/webm")
+          ? "audio/webm"
+          : "audio/mp4",
+      });
       mediaRecorderRef.current = mediaRecorder;
       chunksRef.current = [];
 
@@ -41,7 +49,7 @@ export default function VoiceInput({ onFallback }: Props) {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+        const blob = new Blob(chunksRef.current, { type: mediaRecorder.mimeType });
         setAudioBlob(blob);
         stream.getTracks().forEach((track) => track.stop());
       };
@@ -49,6 +57,7 @@ export default function VoiceInput({ onFallback }: Props) {
       mediaRecorder.start();
       setIsRecording(true);
       setError(null);
+      setResult(null);
       setRecordingTime(0);
 
       timerRef.current = window.setInterval(() => {
@@ -65,7 +74,7 @@ export default function VoiceInput({ onFallback }: Props) {
     }
   };
 
-  const stopRecording = () => {
+  const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
@@ -74,7 +83,7 @@ export default function VoiceInput({ onFallback }: Props) {
         timerRef.current = null;
       }
     }
-  };
+  }, [isRecording]);
 
   const handleProcess = async () => {
     if (!audioBlob) return;
@@ -83,32 +92,80 @@ export default function VoiceInput({ onFallback }: Props) {
     setError(null);
 
     try {
-      // TODO: Call voice extraction API
-      // For now, simulate transcription
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Convert blob to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve) => {
+        reader.onloadend = () => {
+          resolve(reader.result as string);
+        };
+      });
+      reader.readAsDataURL(audioBlob);
+      const base64Data = await base64Promise;
 
-      // Simulated transcript
-      setTranscript(
-        "I'm about 5 foot 10, around 175 pounds. I played basketball in college and do a lot of running now."
-      );
+      const analysisResult = await analyzeVoice(base64Data, audioBlob.type);
+      setResult(analysisResult);
 
-      // After a delay, fall back to form with pre-filled data
-      setTimeout(() => {
-        setError("Extracted some details, but form confirmation needed for accuracy.");
-        setTimeout(() => {
-          onFallback();
-        }, 1500);
-      }, 1500);
-    } catch {
-      setError("Failed to process audio. Please try again or use the form.");
+      if (!analysisResult.success) {
+        setError(analysisResult.error || "Could not process audio");
+        return;
+      }
+
+      // If confidence is high and we have all required data, go directly to processing
+      const extracted = analysisResult.extracted;
+      if (
+        analysisResult.confidence &&
+        analysisResult.confidence >= 0.7 &&
+        extracted?.height_cm &&
+        extracted?.weight_kg &&
+        !analysisResult.requires_confirmation
+      ) {
+        const formData = {
+          height_cm: extracted.height_cm,
+          weight_kg: extracted.weight_kg,
+          arm_span_cm: extracted.arm_span_cm || undefined,
+          activity_preference: extracted.activity_preferences || undefined,
+        };
+        navigate("/processing", { state: { formData } });
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to process audio");
     } finally {
       setProcessing(false);
     }
   };
 
+  const handleConfirm = () => {
+    if (!result?.extracted) return;
+
+    const extracted = result.extracted;
+    const formData = {
+      height_cm: extracted.height_cm || undefined,
+      weight_kg: extracted.weight_kg || undefined,
+      arm_span_cm: extracted.arm_span_cm || undefined,
+      activity_preference: extracted.activity_preferences || undefined,
+    };
+
+    navigate("/processing", { state: { formData } });
+  };
+
+  const handleEdit = () => {
+    if (!result?.extracted) {
+      onFallback();
+      return;
+    }
+
+    const extracted = result.extracted;
+    onFallback({
+      height_cm: extracted.height_cm || undefined,
+      weight_kg: extracted.weight_kg || undefined,
+      arm_span_cm: extracted.arm_span_cm || undefined,
+      activity_preferences: extracted.activity_preferences || undefined,
+    });
+  };
+
   const reset = () => {
     setAudioBlob(null);
-    setTranscript(null);
+    setResult(null);
     setRecordingTime(0);
     setError(null);
   };
@@ -230,19 +287,120 @@ export default function VoiceInput({ onFallback }: Props) {
             </button>
           </div>
 
-          {/* Transcript */}
-          {transcript && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="rounded-xl bg-forge-steel/50 p-4"
-            >
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-ash">
-                Transcript
-              </p>
-              <p className="text-sm italic text-silver">"{transcript}"</p>
-            </motion.div>
-          )}
+          {/* Analysis Results */}
+          <AnimatePresence>
+            {result?.success && result.extracted && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-4"
+              >
+                {/* Transcript */}
+                {result.transcript && (
+                  <div className="rounded-xl bg-forge-steel/50 p-4">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-ash">
+                      Transcript
+                    </p>
+                    <p className="text-sm italic text-silver">"{result.transcript}"</p>
+                  </div>
+                )}
+
+                {/* Confidence indicator */}
+                <div className="flex items-center justify-between rounded-lg bg-forge-steel/50 px-4 py-3">
+                  <span className="text-sm text-smoke">Extraction Confidence</span>
+                  <div className="flex items-center gap-2">
+                    <div className="h-2 w-24 overflow-hidden rounded-full bg-forge-graphite">
+                      <motion.div
+                        className={`h-full rounded-full ${
+                          (result.confidence || 0) >= 0.7
+                            ? "bg-para-green"
+                            : (result.confidence || 0) >= 0.5
+                            ? "bg-gold-core"
+                            : "bg-ember-glow"
+                        }`}
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(result.confidence || 0) * 100}%` }}
+                      />
+                    </div>
+                    <span className="font-mono text-sm text-gold-core">
+                      {Math.round((result.confidence || 0) * 100)}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Extracted measurements */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-forge-steel/50 p-3">
+                    <p className="text-xs text-ash">Height</p>
+                    <p className="font-mono text-lg text-white">
+                      {result.extracted.height_cm
+                        ? `${Math.round(result.extracted.height_cm)} cm`
+                        : "—"}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-forge-steel/50 p-3">
+                    <p className="text-xs text-ash">Weight</p>
+                    <p className="font-mono text-lg text-white">
+                      {result.extracted.weight_kg
+                        ? `${Math.round(result.extracted.weight_kg)} kg`
+                        : "—"}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Activity preferences */}
+                {result.extracted.activity_preferences && result.extracted.activity_preferences.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {result.extracted.activity_preferences.map((activity, i) => (
+                      <span key={i} className="badge badge-gold">
+                        {activity}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                {/* Missing or clarification needed */}
+                {(result.missing_required?.length || result.clarification_needed?.length) && (
+                  <div className="rounded-lg bg-ember-glow/10 p-3">
+                    {result.missing_required && result.missing_required.length > 0 && (
+                      <p className="text-sm text-ember-bright">
+                        Missing: {result.missing_required.join(", ")}
+                      </p>
+                    )}
+                    {result.clarification_needed && result.clarification_needed.length > 0 && (
+                      <p className="text-sm text-smoke">
+                        Needs clarification: {result.clarification_needed.join(", ")}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Action buttons */}
+                <div className="flex gap-3">
+                  <motion.button
+                    onClick={handleConfirm}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    disabled={!result.extracted.height_cm || !result.extracted.weight_kg}
+                    className="btn btn-primary flex-1 disabled:opacity-50"
+                  >
+                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                    Use These Values
+                  </motion.button>
+                  <motion.button
+                    onClick={handleEdit}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="btn bg-forge-steel text-smoke hover:bg-forge-iron hover:text-white"
+                  >
+                    Edit
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Error */}
           {error && (
@@ -255,8 +413,8 @@ export default function VoiceInput({ onFallback }: Props) {
             </motion.p>
           )}
 
-          {/* Process button */}
-          {!processing && !transcript && (
+          {/* Process button (before analysis) */}
+          {!processing && !result && !error && (
             <motion.button
               onClick={handleProcess}
               whileHover={{ scale: 1.02 }}
@@ -285,7 +443,7 @@ export default function VoiceInput({ onFallback }: Props) {
 
       {/* Alternative */}
       <div className="mt-6 text-center">
-        <button onClick={onFallback} className="text-sm text-smoke transition hover:text-gold-core">
+        <button onClick={() => onFallback()} className="text-sm text-smoke transition hover:text-gold-core">
           Skip to manual entry →
         </button>
       </div>

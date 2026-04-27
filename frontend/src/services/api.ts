@@ -206,4 +206,72 @@ export async function getStreamSessionResult(
   return res.data;
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// MULTIMODAL API
+// ══════════════════════════════════════════════════════════════════════════════
+
+export interface PhotoAnalysisResult {
+  success: boolean;
+  confidence?: number;
+  estimates?: {
+    height_cm: number | null;
+    weight_kg: number | null;
+    height_range_cm: [number, number] | null;
+    weight_range_kg: [number, number] | null;
+    build_type: string | null;
+    arm_span_ratio: number | null;
+  };
+  observations?: string[];
+  limitations?: string[];
+  requires_confirmation?: boolean;
+  error?: string;
+}
+
+export interface VoiceAnalysisResult {
+  success: boolean;
+  transcript?: string;
+  confidence?: number;
+  extracted?: {
+    height_cm: number | null;
+    weight_kg: number | null;
+    arm_span_cm: number | null;
+    activity_preferences: string[];
+    build_description: string | null;
+  };
+  missing_required?: string[];
+  clarification_needed?: string[];
+  requires_confirmation?: boolean;
+  error?: string;
+}
+
+/**
+ * Analyze a photo for body proportion estimation.
+ * Accepts base64-encoded image data.
+ */
+export async function analyzePhoto(
+  imageData: string,
+  mimeType: string = "image/jpeg"
+): Promise<PhotoAnalysisResult> {
+  const res = await api.post<PhotoAnalysisResult>("/analyze/photo/base64", {
+    image_data: imageData,
+    mime_type: mimeType,
+  });
+  return res.data;
+}
+
+/**
+ * Analyze a voice recording for biometric extraction.
+ * Accepts base64-encoded audio data.
+ */
+export async function analyzeVoice(
+  audioData: string,
+  mimeType: string = "audio/webm"
+): Promise<VoiceAnalysisResult> {
+  const res = await api.post<VoiceAnalysisResult>("/analyze/voice/base64", {
+    audio_data: audioData,
+    mime_type: mimeType,
+  });
+  return res.data;
+}
+
 export default api;

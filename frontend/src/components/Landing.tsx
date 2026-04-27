@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import InputModeSelector from "./InputModeSelector";
-import PhotoInput from "./PhotoInput";
+import PhotoInput, { type PrefillData } from "./PhotoInput";
 import VoiceInput from "./VoiceInput";
 import FormInput from "./FormInput";
 
@@ -17,6 +17,12 @@ const EMBER_PARTICLES = Array.from({ length: 12 }, (_, i) => ({
 
 export default function Landing() {
   const [inputMode, setInputMode] = useState<InputMode>("photo");
+  const [prefillData, setPrefillData] = useState<PrefillData | undefined>();
+
+  const handleFallbackToForm = (data?: PrefillData) => {
+    setPrefillData(data);
+    setInputMode("form");
+  };
 
   return (
     <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16">
@@ -139,7 +145,7 @@ export default function Landing() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              <PhotoInput onFallback={() => setInputMode("form")} />
+              <PhotoInput onFallback={handleFallbackToForm} />
             </motion.div>
           )}
 
@@ -151,7 +157,7 @@ export default function Landing() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              <VoiceInput onFallback={() => setInputMode("form")} />
+              <VoiceInput onFallback={handleFallbackToForm} />
             </motion.div>
           )}
 
@@ -163,7 +169,7 @@ export default function Landing() {
               exit={{ opacity: 0, x: 20 }}
               transition={{ duration: 0.3 }}
             >
-              <FormInput />
+              <FormInput prefillData={prefillData} />
             </motion.div>
           )}
         </AnimatePresence>
