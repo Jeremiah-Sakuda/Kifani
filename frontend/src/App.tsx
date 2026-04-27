@@ -10,7 +10,15 @@ export default function App() {
 
   return (
     <div className="noise-overlay forge-grid flex min-h-screen flex-col">
-      <div className="flex-1">
+      {/* Skip to main content link for keyboard users */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-gold-core focus:px-4 focus:py-2 focus:text-forge-black focus:outline-none"
+      >
+        Skip to main content
+      </a>
+
+      <div className="flex-1" id="main-content" role="main">
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/processing" element={<Processing />} />

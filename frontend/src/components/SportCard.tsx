@@ -25,9 +25,11 @@ export default function SportCard({
   const accentColor = isParalympic ? "para-green" : "para-blue";
 
   return (
-    <motion.div
+    <motion.article
       className="group relative overflow-hidden rounded-xl bg-forge-steel/60 transition-all duration-300 hover:bg-forge-steel"
       whileHover={{ y: -2 }}
+      role="article"
+      aria-label={`${sport} - ${event}`}
     >
       {/* Accent line */}
       <div
@@ -48,6 +50,8 @@ export default function SportCard({
               <button
                 onClick={() => setShowClassification(!showClassification)}
                 className={`badge badge-paralympic cursor-pointer transition hover:bg-${accentColor}/30`}
+                aria-expanded={showClassification}
+                aria-label={`Show classification details for ${classification}`}
               >
                 {classification}
                 <svg
@@ -98,6 +102,8 @@ export default function SportCard({
           <button
             onClick={() => setExpanded(!expanded)}
             className="mt-2 text-xs font-medium text-gold-core transition hover:text-gold-bright"
+            aria-expanded={expanded}
+            aria-label={expanded ? "Show less description" : "Read more description"}
           >
             {expanded ? "Show less" : "Read more"}
           </button>
@@ -107,7 +113,8 @@ export default function SportCard({
       {/* Hover glow effect */}
       <div
         className={`pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-${accentColor}/10 blur-3xl opacity-0 transition-opacity group-hover:opacity-100`}
+        aria-hidden="true"
       />
-    </motion.div>
+    </motion.article>
   );
 }
