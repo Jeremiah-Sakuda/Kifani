@@ -9,7 +9,7 @@ import math
 from typing import TypedDict
 
 from app.models.schemas import MatchRequest
-from app.models.archetypes import ARCHETYPES, ArchetypeCentroid, SportMapping
+from app.models.archetypes import ARCHETYPES, ArchetypeCentroid
 
 
 class ArchetypeMatchResult(TypedDict):

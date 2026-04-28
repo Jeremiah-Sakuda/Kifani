@@ -6,7 +6,7 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'coverage', 'src/test/**']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -18,6 +18,12 @@ export default defineConfig([
     languageOptions: {
       ecmaVersion: 2020,
       globals: globals.browser,
+    },
+    rules: {
+      // Allow setState in effects for prefill patterns
+      'react-hooks/set-state-in-effect': 'off',
+      // Allow Math.random in render for animation variety (non-critical)
+      'react-hooks/purity': 'off',
     },
   },
 ])

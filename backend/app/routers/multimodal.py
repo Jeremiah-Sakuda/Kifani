@@ -6,7 +6,7 @@ Returns extracted biometric estimates for archetype matching.
 """
 
 import os
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel
 
 from app.services.photo_analysis import (

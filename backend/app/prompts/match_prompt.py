@@ -2,7 +2,6 @@
 Prompt template for Match Mode — generating archetype narratives.
 """
 
-import json
 from app.models.schemas import MatchRequest
 
 

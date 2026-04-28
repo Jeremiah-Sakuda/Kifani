@@ -8,7 +8,7 @@ Returns ranked archetype probabilities with confidence scores.
 from dataclasses import dataclass
 from typing import Any
 
-from app.models.archetypes import ARCHETYPES, get_archetype_by_name
+from app.models.archetypes import get_archetype_by_name
 from app.services.clustering import compute_archetype_match, format_sport_matches
 from app.services.conditional_language import (
     enrich_match_result_with_language,

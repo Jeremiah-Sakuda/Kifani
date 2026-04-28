@@ -320,7 +320,7 @@ def _build_match_prompt(user_input: dict[str, Any]) -> str:
     preferences = user_input.get("activity_preferences", [])
 
     prompt_parts = [
-        f"Analyze this user's profile and match them to a Team USA athlete archetype:",
+        "Analyze this user's profile and match them to a Team USA athlete archetype:",
         f"- Height: {height} cm",
         f"- Weight: {weight} kg",
     ]

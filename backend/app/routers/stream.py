@@ -5,7 +5,6 @@ Provides Server-Sent Events (SSE) stream of agent reasoning,
 tool calls, and results for the Processing screen UI.
 """
 
-import json
 import os
 import uuid
 from typing import AsyncIterator
