@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 export default function Footer() {
   return (
     <footer className="relative z-10 border-t border-forge-graphite/50 bg-forge-black/80 backdrop-blur-sm">
-      <div className="mx-auto max-w-6xl px-6 py-8">
+      <div className="shell py-8">
         <div className="flex flex-col items-center gap-6 text-center md:flex-row md:justify-between md:text-left">
           {/* Project Info */}
           <div className="space-y-2">

@@ -75,7 +75,7 @@ export default function Processing() {
     : Math.round(((completedTools + activeTools * 0.5) / totalTools) * 100);
 
   return (
-    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 py-16">
+    <main className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden py-16">
       {/* Background Effects */}
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-forge-black via-ember-deep/20 to-forge-black" />
@@ -98,7 +98,7 @@ export default function Processing() {
         />
       </div>
 
-      <div className="relative z-10 w-full max-w-2xl">
+      <div className="shell relative z-10 max-w-3xl">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}

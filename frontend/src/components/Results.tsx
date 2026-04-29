@@ -123,7 +123,7 @@ export default function Results() {
         <div className="absolute bottom-0 left-0 h-[600px] w-[600px] translate-y-1/4 -translate-x-1/4 rounded-full bg-ember-glow/[0.02] blur-[120px]" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-6xl px-6 py-12 lg:py-16">
+      <div className="shell relative z-10 py-12 lg:py-16">
         {/* Back Link */}
         <motion.div
           initial={{ opacity: 0 }}
