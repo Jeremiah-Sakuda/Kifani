@@ -84,9 +84,8 @@ The figure should embody:
 Composition:
 - Single heroic figure in dynamic pose
 - Abstract geometric background suggesting motion
-- Olympic rings or torch motif subtly integrated
 - Dramatic lighting with {colors} tones
-- Art deco or modern Olympic poster aesthetic
+- Modern athletic poster aesthetic with bold geometry
 
 Important:
 - Must be clearly artistic/stylized, NOT photorealistic
@@ -241,10 +240,10 @@ def generate_placeholder_svg(archetype: str) -> str:
   <path d="M50,220 Q150,170 250,220" stroke="{c3}" stroke-width="2" fill="none" opacity="0.4"/>
   <path d="M50,240 Q150,190 250,240" stroke="{c3}" stroke-width="2" fill="none" opacity="0.3"/>
 
-  <!-- Olympic rings hint -->
-  <circle cx="130" cy="370" r="12" stroke="#d4a012" stroke-width="2" fill="none" opacity="0.6"/>
-  <circle cx="150" cy="370" r="12" stroke="#d4a012" stroke-width="2" fill="none" opacity="0.6"/>
-  <circle cx="170" cy="370" r="12" stroke="#d4a012" stroke-width="2" fill="none" opacity="0.6"/>
+  <!-- Stylized stars (Team USA) -->
+  <polygon points="130,370 132,376 138,376 133,380 135,386 130,382 125,386 127,380 122,376 128,376" fill="#d4a012" opacity="0.6"/>
+  <polygon points="150,365 152,371 158,371 153,375 155,381 150,377 145,381 147,375 142,371 148,371" fill="#d4a012" opacity="0.7"/>
+  <polygon points="170,370 172,376 178,376 173,380 175,386 170,382 165,386 167,380 162,376 168,376" fill="#d4a012" opacity="0.6"/>
 
   <!-- Archetype text -->
   <text x="150" y="30" text-anchor="middle" fill="white" font-family="serif" font-size="14" opacity="0.8">
