@@ -60,9 +60,9 @@ LANGUAGE_MODIFIERS: dict[ConfidenceLevel, LanguageModifiers] = {
             "clear archetype signature",
         ],
         recommendation_phrases=[
-            "would likely excel in",
-            "has strong potential for",
-            "shows promising alignment with",
+            "could align well with",
+            "shows strong alignment with",
+            "demonstrates characteristics seen in",
         ],
     ),
     "moderate": LanguageModifiers(
