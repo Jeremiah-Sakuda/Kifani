@@ -72,13 +72,13 @@ ARCHETYPE_STYLES: dict[str, dict[str, str]] = {
 # Base prompt template
 BASE_PROMPT = """Create a stylized, artistic portrait representing the {archetype} athletic archetype.
 
-Style: Non-photorealistic digital art, inspired by Olympic poster art and athletic iconography.
+Style: Non-photorealistic digital art, inspired by Team USA poster art and athletic iconography.
 NOT a photograph of a real person. Abstract and symbolic representation.
 
 The figure should embody:
 - Body type: {body_type}
 - Energy/movement: {energy}
-- Color palette: {colors}, with golden accents (Olympic gold)
+- Color palette: {colors}, with golden accents
 - Sport imagery: subtle hints of {sport_elements}
 
 Composition:
