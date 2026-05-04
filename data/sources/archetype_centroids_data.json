@@ -1,0 +1,90 @@
+[
+  {
+    "cluster_id": 0,
+    "name": "Powerhouse",
+    "mean_height_cm": 183.0,
+    "mean_weight_kg": 103.0,
+    "mean_bmi": 30.8,
+    "std_height_cm": 6.2,
+    "std_weight_kg": 14.5,
+    "athlete_count": 1842,
+    "sample_weight": 1.0
+  },
+  {
+    "cluster_id": 1,
+    "name": "Aerobic Engine",
+    "mean_height_cm": 177.8,
+    "mean_weight_kg": 71.7,
+    "mean_bmi": 22.5,
+    "std_height_cm": 5.8,
+    "std_weight_kg": 6.3,
+    "athlete_count": 2156,
+    "sample_weight": 1.0
+  },
+  {
+    "cluster_id": 2,
+    "name": "Precision Athlete",
+    "mean_height_cm": 176.5,
+    "mean_weight_kg": 74.2,
+    "mean_bmi": 23.7,
+    "std_height_cm": 7.4,
+    "std_weight_kg": 9.8,
+    "athlete_count": 1534,
+    "sample_weight": 1.0
+  },
+  {
+    "cluster_id": 3,
+    "name": "Explosive Mover",
+    "mean_height_cm": 178.2,
+    "mean_weight_kg": 70.3,
+    "mean_bmi": 22.0,
+    "std_height_cm": 6.1,
+    "std_weight_kg": 7.2,
+    "athlete_count": 2438,
+    "sample_weight": 1.0
+  },
+  {
+    "cluster_id": 4,
+    "name": "Coordinated Specialist",
+    "mean_height_cm": 164.5,
+    "mean_weight_kg": 59.0,
+    "mean_bmi": 21.6,
+    "std_height_cm": 8.2,
+    "std_weight_kg": 8.1,
+    "athlete_count": 1247,
+    "sample_weight": 1.0
+  },
+  {
+    "cluster_id": 5,
+    "name": "Tactical Endurance",
+    "mean_height_cm": 185.0,
+    "mean_weight_kg": 82.0,
+    "mean_bmi": 24.0,
+    "std_height_cm": 5.4,
+    "std_weight_kg": 7.6,
+    "athlete_count": 1892,
+    "sample_weight": 1.0
+  },
+  {
+    "cluster_id": 6,
+    "name": "Adaptive Power",
+    "mean_height_cm": 175.0,
+    "mean_weight_kg": 85.0,
+    "mean_bmi": 27.8,
+    "std_height_cm": 7.8,
+    "std_weight_kg": 12.4,
+    "athlete_count": 847,
+    "sample_weight": 1.15
+  },
+  {
+    "cluster_id": 7,
+    "name": "Adaptive Endurance",
+    "mean_height_cm": 172.0,
+    "mean_weight_kg": 68.0,
+    "mean_bmi": 23.0,
+    "std_height_cm": 6.4,
+    "std_weight_kg": 7.2,
+    "athlete_count": 612,
+    "sample_weight": 1.15
+  }
+]

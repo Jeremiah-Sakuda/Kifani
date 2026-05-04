@@ -30,6 +30,7 @@ data/sources/noc_regions.csv
 data/sources/*.json
 !data/sources/.gitkeep
 !data/sources/paralympic_classifications.csv
+!data/sources/archetype_centroids_data.json
 
 # GCP credentials
 *.json
