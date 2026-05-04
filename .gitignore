@@ -40,3 +40,6 @@ data/sources/*.json
 
 # Logs
 *.log
+
+# Windows artifacts
+nul
