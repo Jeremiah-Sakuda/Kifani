@@ -203,7 +203,7 @@ ARCHETYPES: list[ArchetypeCentroid] = [
     ArchetypeCentroid(
         name="Explosive Mover",
         description="Optimized for short, powerful bursts of speed and acceleration. Lean but muscular builds with high power-to-weight ratios and fast-twitch muscle dominance — pure athletic explosion.",
-        historical_context="From Jesse Owens to Usain Bolt's American rivals, explosive athletes have defined track & field spectacle. Team USA sprinters average 178cm and 70kg — a ratio that maximizes ground force production relative to mass moved.",
+        historical_context="From the early track & field champions to modern sprinters, explosive athletes have defined American athletics. Team USA sprinters average 178cm and 70kg — a ratio that maximizes ground force production relative to mass moved.",
         mean_height_cm=178.2,
         mean_weight_kg=70.3,
         mean_bmi=22.0,
