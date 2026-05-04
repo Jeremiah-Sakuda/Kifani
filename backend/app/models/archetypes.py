@@ -252,7 +252,7 @@ ARCHETYPES: list[ArchetypeCentroid] = [
     ArchetypeCentroid(
         name="Coordinated Specialist",
         description="Shorter, powerful builds with exceptional body control. The lightest archetype — strength-to-weight mastery, spatial awareness, and acrobatic ability. Where physics meets artistry.",
-        historical_context="American gymnastics dominance from Mary Lou Retton through Simone Biles rests on this archetype. At an average 164.5cm and 59kg, these athletes generate elite power relative to body mass, enabling the rotations and holds that define their sports.",
+        historical_context="American gymnastics has dominated the world stage for decades, with Team USA athletes defining this archetype. At an average 164.5cm and 59kg, these athletes generate elite power relative to body mass, enabling the rotations and holds that define their sports.",
         mean_height_cm=164.5,
         mean_weight_kg=59.0,
         mean_bmi=21.6,
