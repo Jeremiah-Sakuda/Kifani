@@ -105,7 +105,7 @@ ARCHETYPES: list[ArchetypeCentroid] = [
     ArchetypeCentroid(
         name="Aerobic Engine",
         description="Lean and efficient. Bodies tuned for sustained effort over long distances, with exceptional cardiovascular capacity and low body mass relative to height. Built to go the distance.",
-        historical_context="American distance running emerged in the 1970s with athletes like Frank Shorter and has produced Marathon legends ever since. Aerobic Engine athletes average just 71.7kg despite heights near 178cm — a 22.5 BMI optimized for oxygen delivery per kilogram of mass.",
+        historical_context="American distance running emerged in the 1970s and has produced marathon legends ever since. Aerobic Engine athletes average just 71.7kg despite heights near 178cm — a 22.5 BMI optimized for oxygen delivery per kilogram of mass.",
         mean_height_cm=177.8,
         mean_weight_kg=71.7,
         mean_bmi=22.5,
