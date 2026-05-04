@@ -220,14 +220,16 @@ export default function EraTimeline() {
       <main className="px-6 py-8 md:px-12">
         <div className="mx-auto max-w-7xl">
           {/* Archetype Selector */}
-          <div className="mb-8">
-            <label className="mb-3 block text-sm text-ash">Select Archetype</label>
-            <div className="flex flex-wrap gap-2">
+          <div className="mb-8" role="group" aria-labelledby="archetype-selector-label">
+            <span id="archetype-selector-label" className="mb-3 block text-sm text-ash">Select Archetype</span>
+            <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Archetype selection">
               {ARCHETYPES.map((archetype) => (
                 <button
                   key={archetype}
                   onClick={() => setSelectedArchetype(archetype)}
-                  className={`rounded-lg px-4 py-2 text-sm transition ${
+                  role="radio"
+                  aria-checked={selectedArchetype === archetype}
+                  className={`rounded-lg px-4 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-black ${
                     selectedArchetype === archetype
                       ? "bg-gold-core text-forge-black"
                       : "bg-forge-iron text-smoke hover:bg-forge-graphite hover:text-white"
@@ -254,7 +256,34 @@ export default function EraTimeline() {
 
                   {/* D3 Chart */}
                   <div className="overflow-x-auto">
-                    <svg ref={chartRef} width={600} height={200} className="mx-auto" />
+                    <svg
+                      ref={chartRef}
+                      width={600}
+                      height={200}
+                      className="mx-auto"
+                      role="img"
+                      aria-label={`Evolution timeline chart for ${evolutionData.archetype} showing height and weight trends across eras`}
+                    />
+                  </div>
+
+                  {/* Keyboard-accessible era selection */}
+                  <div className="sr-only" role="listbox" aria-label="Select era for details">
+                    {evolutionData.eras.filter(e => e.athlete_count > 0).map((era) => (
+                      <button
+                        key={era.era}
+                        role="option"
+                        aria-selected={selectedEra?.era === era.era}
+                        onClick={() => setSelectedEra(era)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setSelectedEra(era);
+                          }
+                        }}
+                      >
+                        {era.label}: {era.avg_height_cm}cm height, {era.avg_weight_kg}kg weight, {era.athlete_count} athletes
+                      </button>
+                    ))}
                   </div>
 
                   {/* Evolution Summary */}

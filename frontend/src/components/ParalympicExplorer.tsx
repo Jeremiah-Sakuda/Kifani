@@ -92,18 +92,22 @@ export default function ParalympicExplorer() {
       </header>
 
       {/* Tab Navigation */}
-      <nav className="border-b border-forge-graphite/30 px-6 md:px-12">
+      <nav className="border-b border-forge-graphite/30 px-6 md:px-12" aria-label="Paralympic Explorer sections">
         <div className="mx-auto max-w-7xl">
-          <div className="flex gap-1">
+          <div className="flex gap-1" role="tablist">
             {[
-              { id: "archetypes" as Tab, label: "Archetypes" },
-              { id: "classifications" as Tab, label: "Classifications" },
-              { id: "compare" as Tab, label: "Parity Compare" },
+              { id: "archetypes" as Tab, label: "Archetypes", panel: "archetypes-panel" },
+              { id: "classifications" as Tab, label: "Classifications", panel: "classifications-panel" },
+              { id: "compare" as Tab, label: "Parity Compare", panel: "compare-panel" },
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`relative px-4 py-4 text-sm font-medium transition ${
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                aria-controls={tab.panel}
+                id={`${tab.id}-tab`}
+                className={`relative px-4 py-4 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-inset ${
                   activeTab === tab.id
                     ? "text-gold-core"
                     : "text-ash hover:text-white"
@@ -138,6 +142,9 @@ export default function ParalympicExplorer() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
+                  role="tabpanel"
+                  id="archetypes-panel"
+                  aria-labelledby="archetypes-tab"
                   className="space-y-6"
                 >
                   <p className="text-smoke">
@@ -214,22 +221,34 @@ export default function ParalympicExplorer() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
+                  role="tabpanel"
+                  id="classifications-panel"
+                  aria-labelledby="classifications-tab"
                   className="space-y-6"
                 >
                   {/* Search */}
-                  <div className="flex gap-3">
+                  <div className="flex gap-3" role="search">
+                    <label htmlFor="classification-search" className="sr-only">
+                      Search Paralympic classifications
+                    </label>
                     <input
-                      type="text"
+                      type="search"
+                      id="classification-search"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       placeholder="Search classifications (e.g., T54, visual impairment, wheelchair)"
-                      className="flex-1 rounded-lg border border-forge-graphite bg-forge-iron px-4 py-3 text-white placeholder-ash focus:border-gold-core focus:outline-none"
+                      aria-describedby="search-hint"
+                      className="flex-1 rounded-lg border border-forge-graphite bg-forge-iron px-4 py-3 text-white placeholder-ash focus:border-gold-core focus:outline-none focus:ring-2 focus:ring-gold-core"
                     />
+                    <span id="search-hint" className="sr-only">
+                      Enter a classification code, disability type, or sport name
+                    </span>
                     <button
                       onClick={handleSearch}
                       disabled={searching}
-                      className="rounded-lg bg-gold-core px-6 py-3 font-medium text-forge-black transition hover:bg-gold-light disabled:opacity-50"
+                      aria-label={searching ? "Searching..." : "Search classifications"}
+                      className="rounded-lg bg-gold-core px-6 py-3 font-medium text-forge-black transition hover:bg-gold-light disabled:opacity-50 focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-black"
                     >
                       {searching ? "..." : "Search"}
                     </button>
@@ -261,10 +280,12 @@ export default function ParalympicExplorer() {
                   )}
 
                   {/* Sport Filter */}
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Filter by sport">
                     <button
                       onClick={() => setSelectedSport(null)}
-                      className={`rounded-lg px-3 py-1.5 text-sm transition ${
+                      role="radio"
+                      aria-checked={selectedSport === null}
+                      className={`rounded-lg px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-black ${
                         selectedSport === null
                           ? "bg-gold-core text-forge-black"
                           : "bg-forge-iron text-smoke hover:text-white"
@@ -276,7 +297,9 @@ export default function ParalympicExplorer() {
                       <button
                         key={sport}
                         onClick={() => setSelectedSport(sport)}
-                        className={`rounded-lg px-3 py-1.5 text-sm transition ${
+                        role="radio"
+                        aria-checked={selectedSport === sport}
+                        className={`rounded-lg px-3 py-1.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-black ${
                           selectedSport === sport
                             ? "bg-gold-core text-forge-black"
                             : "bg-forge-iron text-smoke hover:text-white"
@@ -321,6 +344,9 @@ export default function ParalympicExplorer() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
+                  role="tabpanel"
+                  id="compare-panel"
+                  aria-labelledby="compare-tab"
                 >
                   <ParityCompare />
                 </motion.div>

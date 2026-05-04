@@ -44,14 +44,22 @@ const MODES: { id: InputMode; label: string; icon: ReactNode; description: strin
 
 export default function InputModeSelector({ activeMode, onModeChange }: Props) {
   return (
-    <div className="flex items-center gap-2 rounded-2xl bg-forge-charcoal/80 p-1.5 backdrop-blur-sm">
+    <div
+      className="flex items-center gap-2 rounded-2xl bg-forge-charcoal/80 p-1.5 backdrop-blur-sm"
+      role="tablist"
+      aria-label="Input method selection"
+    >
       {MODES.map((mode) => {
         const isActive = activeMode === mode.id;
         return (
           <button
             key={mode.id}
             onClick={() => onModeChange(mode.id)}
-            className={`relative flex items-center gap-2.5 rounded-xl px-5 py-3 transition-all duration-300 ${
+            role="tab"
+            aria-selected={isActive}
+            aria-controls={`${mode.id}-panel`}
+            id={`${mode.id}-tab`}
+            className={`relative flex items-center gap-2.5 rounded-xl px-5 py-3 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-charcoal ${
               isActive ? "text-forge-black" : "text-smoke hover:text-white"
             }`}
           >
@@ -65,13 +73,16 @@ export default function InputModeSelector({ activeMode, onModeChange }: Props) {
             )}
 
             {/* Content */}
-            <span className="relative z-10">{mode.icon}</span>
+            <span className="relative z-10" aria-hidden="true">{mode.icon}</span>
             <div className="relative z-10 text-left">
               <span className="block text-sm font-semibold">{mode.label}</span>
               <span className={`block text-[10px] ${isActive ? "text-forge-charcoal" : "text-ash"}`}>
                 {mode.description}
               </span>
             </div>
+            <span className="sr-only">
+              {mode.label}: {mode.description}
+            </span>
           </button>
         );
       })}

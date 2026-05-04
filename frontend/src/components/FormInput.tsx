@@ -145,57 +145,65 @@ export default function FormInput({ prefillData }: Props) {
       )}
 
       {/* Height */}
-      <div className="mb-6">
-        <label className="label">
-          Height <span className="text-ember-bright">*</span>
-        </label>
+      <fieldset className="mb-6">
+        <legend className="label">
+          Height <span className="text-ember-bright" aria-label="required">*</span>
+        </legend>
         <div className="flex gap-3">
           <div className="relative flex-1">
             <input
               type="number"
+              id="height-ft"
               placeholder="5"
               required
+              aria-required="true"
+              aria-label="Height in feet"
               min={3}
               max={8}
               value={heightFt}
               onChange={(e) => setHeightFt(e.target.value)}
               className="input pr-12"
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash">ft</span>
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash" aria-hidden="true">ft</span>
           </div>
           <div className="relative flex-1">
             <input
               type="number"
+              id="height-in"
               placeholder="10"
               required
+              aria-required="true"
+              aria-label="Height in inches"
               min={0}
               max={11}
               value={heightIn}
               onChange={(e) => setHeightIn(e.target.value)}
               className="input pr-12"
             />
-            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash">in</span>
+            <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash" aria-hidden="true">in</span>
           </div>
         </div>
-      </div>
+      </fieldset>
 
       {/* Weight */}
       <div className="mb-6">
-        <label className="label">
-          Weight <span className="text-ember-bright">*</span>
+        <label htmlFor="weight" className="label">
+          Weight <span className="text-ember-bright" aria-label="required">*</span>
         </label>
         <div className="relative">
           <input
             type="number"
+            id="weight"
             placeholder="175"
             required
+            aria-required="true"
             min={50}
             max={500}
             value={weightLbs}
             onChange={(e) => setWeightLbs(e.target.value)}
             className="input pr-12"
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash">lbs</span>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash" aria-hidden="true">lbs</span>
         </div>
       </div>
 
@@ -208,23 +216,27 @@ export default function FormInput({ prefillData }: Props) {
 
       {/* Arm Span */}
       <div className="mb-6">
-        <label className="label">Arm Span</label>
+        <label htmlFor="arm-span" className="label">Arm Span</label>
         <div className="relative">
           <input
             type="number"
+            id="arm-span"
             placeholder="72"
+            aria-describedby="arm-span-hint"
             value={armSpanIn}
             onChange={(e) => setArmSpanIn(e.target.value)}
             className="input pr-12"
           />
-          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash">in</span>
+          <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-ash" aria-hidden="true">in</span>
         </div>
+        <span id="arm-span-hint" className="sr-only">Optional: Your wingspan measurement in inches</span>
       </div>
 
       {/* Age Range */}
       <div className="mb-6">
-        <label className="label">Age Range</label>
+        <label htmlFor="age-range" className="label">Age Range</label>
         <select
+          id="age-range"
           value={ageRange}
           onChange={(e) => setAgeRange(e.target.value)}
           className="input appearance-none bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236b6b6b%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:10px] bg-[right_1rem_center] bg-no-repeat pr-10"
@@ -238,9 +250,9 @@ export default function FormInput({ prefillData }: Props) {
       </div>
 
       {/* Activity Preference */}
-      <div className="mb-8">
-        <label className="label">Activity Preference</label>
-        <div className="flex flex-wrap gap-2">
+      <fieldset className="mb-8">
+        <legend className="label">Activity Preference</legend>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Select your preferred activities">
           {ACTIVITY_OPTIONS.map((activity) => {
             const isSelected = activities.includes(activity.id);
             return (
@@ -248,30 +260,34 @@ export default function FormInput({ prefillData }: Props) {
                 key={activity.id}
                 type="button"
                 onClick={() => toggleActivity(activity.id)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 ${
+                aria-pressed={isSelected}
+                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-steel ${
                   isSelected
                     ? "bg-gold-core/20 text-gold-bright ring-1 ring-gold-core/40"
                     : "bg-forge-steel text-smoke hover:bg-forge-iron hover:text-white"
                 }`}
               >
-                <span>{activity.icon}</span>
+                <span aria-hidden="true">{activity.icon}</span>
                 <span>{activity.label}</span>
               </button>
             );
           })}
         </div>
-      </div>
+      </fieldset>
 
       {/* Error */}
-      {error && (
-        <motion.p
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-4 rounded-lg bg-ember-glow/10 px-4 py-3 text-center text-sm text-ember-bright"
-        >
-          {error}
-        </motion.p>
-      )}
+      <div aria-live="polite" aria-atomic="true">
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            role="alert"
+            className="mb-4 rounded-lg bg-ember-glow/10 px-4 py-3 text-center text-sm text-ember-bright"
+          >
+            {error}
+          </motion.p>
+        )}
+      </div>
 
       {/* Submit */}
       <motion.button
