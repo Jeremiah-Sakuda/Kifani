@@ -20,6 +20,10 @@ FORGED matches fans to one of 8 Team USA athlete archetypes based on their physi
 4. **Get your stylized portrait** — Imagen generates a non-photorealistic artistic portrait representing your archetype
 5. **Ask follow-up questions** — Continue the conversation with our Gemini-powered agent
 
+**Beyond Personal Matching:**
+- **Paralympic Spotlight** — Explore 30+ classification codes, see side-by-side Olympic/Paralympic parity comparisons, and discover Paralympic-first archetypes
+- **Era Time Machine** — D3.js visualization of how each archetype's body type has evolved across 4 eras (1896–1950, 1950–1980, 1980–2000, 2000+)
+
 The 8 archetypes include 2 Paralympic-first categories (Adaptive Power, Adaptive Endurance) ensuring Paralympic athletes aren't just included — they're featured.
 
 ## How we built it
@@ -55,9 +59,12 @@ The 8 archetypes include 2 Paralympic-first categories (Adaptive Power, Adaptive
 
 ## Accomplishments that we're proud of
 
-- **Structural Paralympic parity** — Not a checkbox feature. 2 dedicated Paralympic-first archetypes, 30+ classification code explainers, and weighted clustering.
+- **Structural Paralympic parity** — Not a checkbox feature. 2 dedicated Paralympic-first archetypes, 30+ classification code explainers, side-by-side parity comparisons, and 1.15x weighted clustering.
+- **Era Time Machine** — D3.js visualization of 120 years of athlete evolution with per-archetype statistics across 4 historical eras.
 - **Real agentic architecture** — 4 specialized tools with visible reasoning trace, not simulated loading spinners.
 - **Imagen Digital Mirror** — The stylized portrait reveal creates a memorable moment.
+- **Conditional language compliance** — Built-in validation layer that rewrites any definitive claims to hedged phrasing.
+- **Full accessibility** — ARIA labels, keyboard navigation, screen reader support, WCAG-compliant focus states.
 - **Data compliance** — Zero prohibited data (no times, no NIL, no IOC IP).
 
 ## What we learned
@@ -69,10 +76,10 @@ The 8 archetypes include 2 Paralympic-first categories (Adaptive Power, Adaptive
 
 ## What's next for FORGED
 
-1. **More archetypes** — Expand from 8 to 12+ with sport-specific variants
-2. **AR Mirror** — Use ARCore to project the archetype portrait onto the user's camera feed
-3. **Team comparison** — Let friend groups discover their collective archetype mix
-4. **Historical deep-dives** — Connect users to specific eras (1920s vs 2020s athletes)
+1. **Squad Mode** — Let friend groups discover their collective archetype mix with Firestore-backed room state
+2. **Live Voice** — Real-time voice interaction using Gemini Live Voice API
+3. **AR Mirror** — Use ARCore to project the archetype portrait onto the user's camera feed
+4. **More archetypes** — Expand from 8 to 12+ with sport-specific variants
 5. **Training recommendations** — Partner with trainers to suggest archetype-appropriate workouts
 
 ---
