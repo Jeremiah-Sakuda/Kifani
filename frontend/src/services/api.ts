@@ -300,4 +300,116 @@ export async function generatePortrait(
   return res.data;
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// PARALYMPIC SPOTLIGHT API
+// ══════════════════════════════════════════════════════════════════════════════
+
+export interface ClassificationInfo {
+  code: string;
+  sport: string;
+  category: string;
+  description: string;
+  eligibility: string;
+  events: string[];
+}
+
+export interface ParalympicArchetype {
+  name: string;
+  description: string;
+  is_paralympic_first: boolean;
+  paralympic_sports: string[];
+  olympic_sports: string[];
+  sample_weight: number;
+  athlete_count: number;
+}
+
+export interface ParityComparison {
+  event_category: string;
+  olympic_events: Array<{ event: string; description: string }>;
+  paralympic_events: Array<{
+    event: string;
+    classification?: string;
+    description: string;
+  }>;
+  parity_note: string;
+}
+
+export interface ParalympicExploreResponse {
+  classifications: ClassificationInfo[];
+  matching_archetypes: string[];
+  context: string;
+}
+
+/**
+ * List all Paralympic classification codes grouped by sport.
+ */
+export async function listClassifications(): Promise<{
+  sports: string[];
+  classifications_by_sport: Record<string, ClassificationInfo[]>;
+  total_classifications: number;
+}> {
+  const res = await api.get("/explore/paralympic/classifications");
+  return res.data;
+}
+
+/**
+ * Explore Paralympic classifications by family/keyword.
+ */
+export async function exploreParalympic(
+  classificationFamily: string,
+  archetype?: string
+): Promise<ParalympicExploreResponse> {
+  const res = await api.post("/explore/paralympic/explore", {
+    classification_family: classificationFamily,
+    archetype,
+  });
+  return res.data;
+}
+
+/**
+ * List archetypes with Paralympic representation.
+ */
+export async function listParalympicArchetypes(): Promise<{
+  archetypes: ParalympicArchetype[];
+  paralympic_first_count: number;
+  total: number;
+}> {
+  const res = await api.get("/explore/paralympic/archetypes");
+  return res.data;
+}
+
+/**
+ * Get side-by-side Olympic/Paralympic event comparison.
+ */
+export async function compareParityEvents(
+  eventType: string,
+  archetype?: string
+): Promise<ParityComparison> {
+  const res = await api.post("/explore/paralympic/parity-compare", {
+    event_type: eventType,
+    archetype,
+  });
+  return res.data;
+}
+
+/**
+ * Get detailed Paralympic information for an archetype.
+ */
+export async function getParalympicArchetypeDetails(
+  archetypeName: string
+): Promise<{
+  archetype: string;
+  description: string;
+  is_paralympic_first: boolean;
+  sample_weight: number;
+  paralympic_sports: SportMatch[];
+  context_note: string;
+  classifications_available: number;
+}> {
+  const res = await api.get(
+    `/explore/paralympic/archetype/${encodeURIComponent(archetypeName)}`
+  );
+  return res.data;
+}
+
 export default api;

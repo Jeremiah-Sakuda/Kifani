@@ -2,11 +2,12 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Landing from "./components/Landing";
 import Results from "./components/Results";
 import Processing from "./components/Processing";
+import ParalympicExplorer from "./components/ParalympicExplorer";
 import Footer from "./components/Footer";
 
 export default function App() {
   const location = useLocation();
-  const showFooter = location.pathname === "/" || location.pathname.startsWith("/results");
+  const showFooter = location.pathname === "/" || location.pathname.startsWith("/results") || location.pathname === "/paralympic";
 
   return (
     <div className="noise-overlay forge-grid flex min-h-screen flex-col">
@@ -23,6 +24,7 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/processing" element={<Processing />} />
           <Route path="/results/:sessionId" element={<Results />} />
+          <Route path="/paralympic" element={<ParalympicExplorer />} />
         </Routes>
       </div>
       {showFooter && <Footer />}

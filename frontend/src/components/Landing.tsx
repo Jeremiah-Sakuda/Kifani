@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import InputModeSelector from "./InputModeSelector";
 import PhotoInput, { type PrefillData } from "./PhotoInput";
@@ -190,6 +190,37 @@ export default function Landing() {
               )}
             </div>
           </motion.div>
+        </div>
+      </div>
+
+      {/* Paralympic Spotlight CTA */}
+      <div className="border-t border-forge-graphite/30 bg-amber-950/10 py-12">
+        <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
+          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+            <div>
+              <div className="flex items-center gap-2">
+                <div className="h-px w-8 bg-amber-500/50" />
+                <span className="font-mono text-xs uppercase tracking-widest text-amber-500">
+                  Paralympic Spotlight
+                </span>
+              </div>
+              <h2 className="mt-2 font-display text-2xl text-white">
+                Explore by Classification
+              </h2>
+              <p className="mt-1 text-smoke">
+                Most tools treat Paralympic athletes as a footnote. We built two ways in.
+              </p>
+            </div>
+            <Link
+              to="/paralympic"
+              className="inline-flex items-center gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-5 py-3 font-medium text-amber-400 transition hover:bg-amber-500/20"
+            >
+              Explore Paralympics
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
 
