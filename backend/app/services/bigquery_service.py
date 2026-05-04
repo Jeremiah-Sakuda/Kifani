@@ -91,3 +91,83 @@ async def get_classification_info(classification_code: str) -> dict:
 
     rows = [dict(row) for row in results]
     return rows[0] if rows else {"error": "Classification not found"}
+
+
+async def get_total_athlete_count() -> dict:
+    """Get total athlete counts broken down by games type."""
+    client = _get_client()
+
+    query = f"""
+        SELECT
+            games_type,
+            COUNT(*) as count,
+            MIN(year) as earliest_year,
+            MAX(year) as latest_year
+        FROM `{PROJECT_ID}.{DATASET}.athletes`
+        GROUP BY games_type
+    """
+    try:
+        results = client.query(query).result()
+        rows = {row["games_type"]: dict(row) for row in results}
+
+        olympic_count = rows.get("O", {}).get("count", 0)
+        paralympic_count = rows.get("P", {}).get("count", 0)
+
+        return {
+            "total": olympic_count + paralympic_count,
+            "olympic": olympic_count,
+            "paralympic": paralympic_count,
+            "earliest_year": min(
+                rows.get("O", {}).get("earliest_year", 9999),
+                rows.get("P", {}).get("earliest_year", 9999)
+            ),
+            "latest_year": max(
+                rows.get("O", {}).get("latest_year", 0),
+                rows.get("P", {}).get("latest_year", 0)
+            ),
+            "source": "bigquery",
+        }
+    except Exception:
+        # Return fallback data if BigQuery unavailable
+        return {
+            "total": 16065,
+            "olympic": 14218,
+            "paralympic": 2847,
+            "earliest_year": 1896,
+            "latest_year": 2024,
+            "source": "fallback",
+        }
+
+
+async def get_archetype_distribution() -> dict:
+    """Get athlete distribution across archetypes from BigQuery."""
+    client = _get_client()
+
+    query = f"""
+        SELECT
+            name,
+            athlete_count,
+            mean_height_cm,
+            mean_weight_kg,
+            mean_bmi,
+            sample_weight
+        FROM `{PROJECT_ID}.{DATASET}.archetype_centroids`
+        ORDER BY athlete_count DESC
+    """
+    try:
+        results = client.query(query).result()
+        archetypes = [dict(row) for row in results]
+        total = sum(a.get("athlete_count", 0) for a in archetypes)
+
+        return {
+            "archetypes": archetypes,
+            "total_athletes": total,
+            "source": "bigquery",
+        }
+    except Exception:
+        # Return fallback data if BigQuery unavailable
+        return {
+            "archetypes": [],
+            "total_athletes": 16065,
+            "source": "fallback",
+        }

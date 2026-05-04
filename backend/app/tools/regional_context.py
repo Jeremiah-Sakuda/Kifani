@@ -5,10 +5,12 @@ Returns aggregated archetype prevalence patterns for a region.
 No individual identification — patterns only based on aggregated data.
 """
 
+import asyncio
 from dataclasses import dataclass
 from typing import Any
 
 from app.models.archetypes import ARCHETYPES, get_archetype_by_name
+from app.services import bigquery_service
 
 
 # Aggregated regional data based on public census + historical Team USA hometown data
@@ -210,6 +212,26 @@ def regional_context_tool(args: RegionalContextArgs) -> dict[str, Any]:
     else:
         interpretation = f"The {region_name} is close to the national average for {archetype.name} athlete representation."
 
+    # Fetch BigQuery stats to make athlete count claim load-bearing
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            # If we're already in an async context, create a task
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                athlete_stats = executor.submit(
+                    lambda: asyncio.run(bigquery_service.get_total_athlete_count())
+                ).result()
+        else:
+            athlete_stats = asyncio.run(bigquery_service.get_total_athlete_count())
+    except Exception:
+        athlete_stats = {
+            "total": 16065,
+            "olympic": 14218,
+            "paralympic": 2847,
+            "source": "fallback",
+        }
+
     return {
         "region": region_name,
         "archetype": archetype.name,
@@ -219,6 +241,12 @@ def regional_context_tool(args: RegionalContextArgs) -> dict[str, Any]:
         "notable_programs": region_data.get("notable_programs", []),
         "regional_history": region_data.get("historical_context", ""),
         "all_regions_comparison": comparison[:5],  # Top 5
+        "dataset_stats": {
+            "total_athletes": athlete_stats.get("total", 16065),
+            "olympic_athletes": athlete_stats.get("olympic", 14218),
+            "paralympic_athletes": athlete_stats.get("paralympic", 2847),
+            "data_source": athlete_stats.get("source", "fallback"),
+        },
         "note": "Data aggregated from public census and historical Team USA hometown records. No individual identification.",
     }
 
