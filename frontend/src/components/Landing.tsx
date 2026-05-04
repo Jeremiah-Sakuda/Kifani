@@ -193,29 +193,53 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Paralympic Spotlight CTA */}
-      <div className="border-t border-forge-graphite/30 bg-amber-950/10 py-12">
-        <div className="mx-auto max-w-7xl px-6 md:px-12 lg:px-20">
-          <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
-            <div>
-              <div className="flex items-center gap-2">
-                <div className="h-px w-8 bg-amber-500/50" />
-                <span className="font-mono text-xs uppercase tracking-widest text-amber-500">
-                  Paralympic Spotlight
-                </span>
-              </div>
-              <h2 className="mt-2 font-display text-2xl text-white">
-                Explore by Classification
-              </h2>
-              <p className="mt-1 text-smoke">
-                Most tools treat Paralympic athletes as a footnote. We built two ways in.
-              </p>
+      {/* Feature CTAs */}
+      <div className="border-t border-forge-graphite/30 py-12">
+        <div className="mx-auto grid max-w-7xl gap-6 px-6 md:grid-cols-2 md:px-12 lg:px-20">
+          {/* Paralympic Spotlight CTA */}
+          <div className="rounded-xl border border-amber-500/30 bg-amber-950/10 p-6">
+            <div className="flex items-center gap-2">
+              <div className="h-px w-8 bg-amber-500/50" />
+              <span className="font-mono text-xs uppercase tracking-widest text-amber-500">
+                Paralympic Spotlight
+              </span>
             </div>
+            <h2 className="mt-3 font-display text-2xl text-white">
+              Explore by Classification
+            </h2>
+            <p className="mt-2 text-sm text-smoke">
+              Most tools treat Paralympic athletes as a footnote. We built two ways in.
+            </p>
             <Link
               to="/paralympic"
-              className="inline-flex items-center gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-5 py-3 font-medium text-amber-400 transition hover:bg-amber-500/20"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-400 transition hover:bg-amber-500/20"
             >
               Explore Paralympics
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </Link>
+          </div>
+
+          {/* Era Time Machine CTA */}
+          <div className="rounded-xl border border-gold-core/30 bg-gold-core/5 p-6">
+            <div className="flex items-center gap-2">
+              <div className="h-px w-8 bg-gold-core/50" />
+              <span className="font-mono text-xs uppercase tracking-widest text-gold-core">
+                Era Time Machine
+              </span>
+            </div>
+            <h2 className="mt-3 font-display text-2xl text-white">
+              120 Years of Evolution
+            </h2>
+            <p className="mt-2 text-sm text-smoke">
+              See how archetypes have evolved from Pioneer Era (pre-1950) to today.
+            </p>
+            <Link
+              to="/era"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gold-core/50 bg-gold-core/10 px-4 py-2 text-sm font-medium text-gold-core transition hover:bg-gold-core/20"
+            >
+              Explore Timeline
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>

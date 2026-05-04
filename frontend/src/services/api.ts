@@ -412,4 +412,110 @@ export async function getParalympicArchetypeDetails(
   return res.data;
 }
 
+// ══════════════════════════════════════════════════════════════════════════════
+// ERA TIME MACHINE API
+// ══════════════════════════════════════════════════════════════════════════════
+
+export interface EraDefinition {
+  key: string;
+  label: string;
+  years: [number, number];
+  color: string;
+}
+
+export interface EraData {
+  era: string;
+  label: string;
+  years: [number, number];
+  color: string;
+  avg_height_cm: number | null;
+  avg_weight_kg: number | null;
+  avg_bmi: number | null;
+  athlete_count: number;
+  top_sports: string[];
+  narrative: string;
+}
+
+export interface EvolutionSummary {
+  height_change_cm: number;
+  weight_change_kg: number;
+  total_athlete_growth: number;
+  direction: string;
+}
+
+export interface EraEvolutionResponse {
+  archetype: string;
+  description: string;
+  eras: EraData[];
+  evolution_summary: EvolutionSummary | null;
+  current_stats: {
+    mean_height_cm: number;
+    mean_weight_kg: number;
+    mean_bmi: number;
+    athlete_count: number;
+  };
+}
+
+/**
+ * List all era definitions.
+ */
+export async function listEras(): Promise<{ eras: EraDefinition[]; total: number }> {
+  const res = await api.get("/era/eras");
+  return res.data;
+}
+
+/**
+ * Get era evolution data for an archetype.
+ */
+export async function getEraEvolution(archetypeName: string): Promise<EraEvolutionResponse> {
+  const res = await api.get(`/era/evolution/${encodeURIComponent(archetypeName)}`);
+  return res.data;
+}
+
+/**
+ * Compare era evolution across all archetypes.
+ */
+export async function compareErasAllArchetypes(): Promise<{
+  archetypes: Array<{
+    archetype: string;
+    is_paralympic_first: boolean;
+    eras: Array<{
+      era: string;
+      height: number | null;
+      weight: number | null;
+      count: number;
+    }>;
+    evolution_summary: EvolutionSummary | null;
+  }>;
+  total: number;
+  era_labels: Record<string, string>;
+}> {
+  const res = await api.get("/era/compare");
+  return res.data;
+}
+
+/**
+ * Get all archetypes for a specific era.
+ */
+export async function getEraTimeline(era: string): Promise<{
+  era: string;
+  label: string;
+  years: [number, number];
+  color: string;
+  archetypes: Array<{
+    archetype: string;
+    is_paralympic_first: boolean;
+    avg_height_cm: number | null;
+    avg_weight_kg: number | null;
+    avg_bmi: number | null;
+    athlete_count: number;
+    top_sports: string[];
+    narrative: string;
+  }>;
+  total_athletes: number;
+}> {
+  const res = await api.get(`/era/timeline/${encodeURIComponent(era)}`);
+  return res.data;
+}
+
 export default api;
