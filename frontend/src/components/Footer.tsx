@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -17,6 +18,28 @@ export default function Footer() {
               A Gemini-powered exploration of athletic archetypes
             </p>
           </div>
+
+          {/* Navigation Links */}
+          <nav className="flex items-center gap-4 text-sm">
+            <Link
+              to="/paralympic"
+              className="text-ash transition hover:text-gold-core"
+            >
+              Paralympic Explorer
+            </Link>
+            <Link
+              to="/era"
+              className="text-ash transition hover:text-gold-core"
+            >
+              Era Timeline
+            </Link>
+            <Link
+              to="/about"
+              className="text-ash transition hover:text-gold-core"
+            >
+              About & Methodology
+            </Link>
+          </nav>
 
           {/* Partner Logos / Credits */}
           <div className="flex flex-col items-center gap-4 md:items-end">

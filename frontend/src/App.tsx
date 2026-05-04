@@ -4,11 +4,12 @@ import Results from "./components/Results";
 import Processing from "./components/Processing";
 import ParalympicExplorer from "./components/ParalympicExplorer";
 import EraTimeline from "./components/EraTimeline";
+import About from "./components/About";
 import Footer from "./components/Footer";
 
 export default function App() {
   const location = useLocation();
-  const showFooter = location.pathname === "/" || location.pathname.startsWith("/results") || location.pathname === "/paralympic" || location.pathname === "/era";
+  const showFooter = location.pathname === "/" || location.pathname.startsWith("/results") || location.pathname === "/paralympic" || location.pathname === "/era" || location.pathname === "/about";
 
   return (
     <div className="noise-overlay forge-grid flex min-h-screen flex-col">
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="/results/:sessionId" element={<Results />} />
           <Route path="/paralympic" element={<ParalympicExplorer />} />
           <Route path="/era" element={<EraTimeline />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </div>
       {showFooter && <Footer />}
