@@ -1,6 +1,6 @@
 # FORGED - Cloud Build Configuration
 # ══════════════════════════════════════════════════════════════════════════════
-# Builds and deploys both frontend and backend to Cloud Run
+# Runs tests, then builds and deploys both frontend and backend to Cloud Run
 #
 # Required substitutions (set in Cloud Build trigger or command line):
 #   _REGION: Cloud Run region (e.g., us-central1)
@@ -19,10 +19,46 @@ substitutions:
 
 steps:
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 1: Build Backend Docker Image
+  # Step 1: Run Backend Tests
+  # ════════════════════════════════════════════════════════════════════════════
+  - name: 'python:3.12-slim'
+    id: 'test-backend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        cd backend
+        pip install --quiet -r requirements.txt
+        pip install --quiet pytest
+        echo "══════════════════════════════════════════════════════════════════"
+        echo "Running Backend Tests"
+        echo "══════════════════════════════════════════════════════════════════"
+        DEV_MODE=true pytest tests/ -v --tb=short
+        echo "✓ Backend tests passed"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Step 2: Run Frontend Tests
+  # ════════════════════════════════════════════════════════════════════════════
+  - name: 'node:20-slim'
+    id: 'test-frontend'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        cd frontend
+        npm ci --quiet
+        echo "══════════════════════════════════════════════════════════════════"
+        echo "Running Frontend Tests"
+        echo "══════════════════════════════════════════════════════════════════"
+        npm run test:ci
+        echo "✓ Frontend tests passed"
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Step 3: Build Backend Docker Image (only after tests pass)
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-backend'
+    waitFor: ['test-backend']
     args:
       - 'build'
       - '-t'
@@ -32,7 +68,19 @@ steps:
       - './backend'
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 2: Push Backend Image
+  # Step 4: Build Frontend Docker Image (only after tests pass)
+  # ════════════════════════════════════════════════════════════════════════════
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-frontend-initial'
+    waitFor: ['test-frontend']
+    args:
+      - 'build'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/${_FRONTEND_SERVICE}:build-check'
+      - './frontend'
+
+  # ════════════════════════════════════════════════════════════════════════════
+  # Step 5: Push Backend Image
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-backend'
@@ -42,7 +90,7 @@ steps:
       - 'gcr.io/$PROJECT_ID/${_BACKEND_SERVICE}:${_TAG}'
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 3: Deploy Backend to Cloud Run
+  # Step 6: Deploy Backend to Cloud Run
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-backend'
@@ -71,7 +119,7 @@ steps:
       - 'GCP_PROJECT_ID=$PROJECT_ID,GCP_LOCATION=${_REGION},DEV_MODE=false'
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 4: Get Backend URL
+  # Step 7: Get Backend URL
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'get-backend-url'
@@ -86,11 +134,11 @@ steps:
         echo "Backend URL: $(cat /workspace/backend_url.txt)"
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 5: Build Frontend Docker Image (with Backend URL)
+  # Step 8: Build Frontend Docker Image (with Backend URL)
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
-    waitFor: ['get-backend-url']
+    waitFor: ['get-backend-url', 'build-frontend-initial']
     entrypoint: 'bash'
     args:
       - '-c'
@@ -103,7 +151,7 @@ steps:
           ./frontend
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 6: Push Frontend Image
+  # Step 9: Push Frontend Image
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-frontend'
@@ -113,7 +161,7 @@ steps:
       - 'gcr.io/$PROJECT_ID/${_FRONTEND_SERVICE}:${_TAG}'
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 7: Deploy Frontend to Cloud Run
+  # Step 10: Deploy Frontend to Cloud Run
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-frontend'
@@ -140,7 +188,7 @@ steps:
       - '10'
 
   # ════════════════════════════════════════════════════════════════════════════
-  # Step 8: Print Deployment URLs
+  # Step 11: Print Deployment URLs
   # ════════════════════════════════════════════════════════════════════════════
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'print-urls'
@@ -152,6 +200,8 @@ steps:
         echo "═══════════════════════════════════════════════════════════════"
         echo "FORGED Deployment Complete!"
         echo "═══════════════════════════════════════════════════════════════"
+        echo ""
+        echo "✓ All tests passed"
         echo ""
         echo "Backend URL:"
         gcloud run services describe ${_BACKEND_SERVICE} --region=${_REGION} --format='value(status.url)'
@@ -168,8 +218,8 @@ images:
   - 'gcr.io/$PROJECT_ID/${_FRONTEND_SERVICE}:${_TAG}'
   - 'gcr.io/$PROJECT_ID/${_FRONTEND_SERVICE}:latest'
 
-# Build timeout (15 minutes)
-timeout: '900s'
+# Build timeout (20 minutes - increased for tests)
+timeout: '1200s'
 
 # Build options
 options:
