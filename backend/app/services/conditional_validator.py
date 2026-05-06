@@ -12,7 +12,6 @@ This is a real validation pass, not static phrase substitution.
 import logging
 import os
 from dataclasses import dataclass
-from typing import Optional
 
 from google.cloud import aiplatform
 from vertexai.generative_models import GenerativeModel, GenerationConfig
@@ -136,7 +135,7 @@ async def validate_conditional_language(
         was_modified = validated_text != text
 
         trace_parts = [
-            f"Gemini Flash validation completed",
+            "Gemini Flash validation completed",
             f"Model: {MODEL_NAME}",
             f"Input length: {len(text)} chars",
             f"Output length: {len(validated_text)} chars",
