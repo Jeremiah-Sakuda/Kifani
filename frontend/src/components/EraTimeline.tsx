@@ -3,9 +3,7 @@ import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import * as d3 from "d3";
 import {
-  listEras,
   getEraEvolution,
-  type EraDefinition,
   type EraData,
   type EraEvolutionResponse,
 } from "../services/api";
@@ -22,25 +20,11 @@ const ARCHETYPES = [
 ];
 
 export default function EraTimeline() {
-  const [eras, setEras] = useState<EraDefinition[]>([]);
   const [selectedArchetype, setSelectedArchetype] = useState("Powerhouse");
   const [evolutionData, setEvolutionData] = useState<EraEvolutionResponse | null>(null);
   const [selectedEra, setSelectedEra] = useState<EraData | null>(null);
   const [loading, setLoading] = useState(true);
   const chartRef = useRef<SVGSVGElement>(null);
-
-  // Load era definitions
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await listEras();
-        setEras(data.eras);
-      } catch (error) {
-        console.error("Failed to load eras:", error);
-      }
-    }
-    load();
-  }, []);
 
   // Load evolution data for selected archetype
   useEffect(() => {
