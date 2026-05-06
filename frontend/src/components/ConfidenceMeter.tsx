@@ -121,11 +121,11 @@ export default function ConfidenceMeter({ confidence, showExplanation = true }: 
       </div>
 
       {/* Scale labels */}
-      <div className="mt-1 flex justify-between text-[10px] text-ash">
-        <span>Uncertain</span>
-        <span>Low</span>
-        <span>Moderate</span>
-        <span>High</span>
+      <div className="mt-2 grid grid-cols-4 text-[10px] text-ash">
+        <span className="text-left">Uncertain</span>
+        <span className="text-center">Low</span>
+        <span className="text-center">Moderate</span>
+        <span className="text-right">High</span>
       </div>
 
       {/* Explanation */}

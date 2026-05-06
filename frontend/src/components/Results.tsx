@@ -167,7 +167,7 @@ export default function Results() {
           </motion.h1>
 
           {/* Confidence Meter */}
-          <motion.div variants={fadeUp} className="mx-auto mb-8 max-w-xl">
+          <motion.div variants={fadeUp} className="mx-auto mb-8 w-full max-w-2xl px-4">
             <ConfidenceMeter confidence={confidence} showExplanation />
           </motion.div>
 
