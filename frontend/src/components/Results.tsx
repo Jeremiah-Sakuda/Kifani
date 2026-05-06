@@ -12,6 +12,7 @@ import SportCard from "./SportCard";
 import ChatInterface from "./ChatInterface";
 import MirrorReveal from "./MirrorReveal";
 import ConfidenceMeter from "./ConfidenceMeter";
+import ShareCard from "./ShareCard";
 
 // Normalize streaming result to match expected format
 function normalizeResult(
@@ -318,11 +319,34 @@ export default function Results() {
           </div>
         </motion.section>
 
+        {/* Share Your Result */}
+        <motion.section
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.1 }}
+          className="mb-20"
+        >
+          <div className="mb-6 flex items-center gap-3">
+            <div className="h-px flex-1 bg-forge-graphite" />
+            <h2 className="font-mono text-xs uppercase tracking-wider text-ash">
+              Share Your Result
+            </h2>
+            <div className="h-px flex-1 bg-forge-graphite" />
+          </div>
+          <div className="flex justify-center">
+            <ShareCard
+              archetype={result.primary_archetype.name}
+              confidence={confidence}
+              sessionId={sessionId || ""}
+            />
+          </div>
+        </motion.section>
+
         {/* Chat Interface */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.2 }}
+          transition={{ delay: 1.3 }}
         >
           <div className="mb-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-forge-graphite" />

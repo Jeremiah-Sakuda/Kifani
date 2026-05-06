@@ -1,0 +1,154 @@
+import { useRef, useState } from "react";
+import { motion } from "framer-motion";
+import html2canvas from "html2canvas";
+
+interface ShareCardProps {
+  archetype: string;
+  confidence: number;
+  sessionId: string;
+}
+
+export default function ShareCard({ archetype, confidence, sessionId }: ShareCardProps) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const shareUrl = `${window.location.origin}/results/${sessionId}`;
+
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+
+    setIsGenerating(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        scale: 2,
+        backgroundColor: "#0D0D0F",
+        logging: false,
+      });
+
+      const link = document.createElement("a");
+      link.download = `forged-${archetype.toLowerCase().replace(/\s+/g, "-")}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch (error) {
+      console.error("Failed to generate image:", error);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy link:", error);
+    }
+  };
+
+  const getConfidenceLabel = (conf: number) => {
+    if (conf >= 0.75) return "Strong Match";
+    if (conf >= 0.55) return "Good Match";
+    if (conf >= 0.35) return "Moderate Match";
+    return "Exploratory Match";
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* The shareable card */}
+      <div
+        ref={cardRef}
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-forge-obsidian via-forge-charcoal to-forge-obsidian p-8"
+        style={{ width: "400px" }}
+      >
+        {/* Background decorations */}
+        <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-gold-core/10 blur-3xl" />
+        <div className="absolute -bottom-20 -left-20 h-40 w-40 rounded-full bg-ember-glow/10 blur-3xl" />
+
+        {/* Content */}
+        <div className="relative z-10">
+          {/* Header */}
+          <div className="mb-6 flex items-center justify-between">
+            <span className="font-display text-sm tracking-widest text-gold-core">
+              FORGED
+            </span>
+            <span className="rounded-full bg-forge-steel/50 px-3 py-1 text-xs text-smoke">
+              Team USA Archetype
+            </span>
+          </div>
+
+          {/* Main content */}
+          <div className="mb-6 text-center">
+            <p className="mb-2 text-sm text-smoke">I am a</p>
+            <h2 className="mb-3 font-display text-4xl text-gradient-gold">
+              {archetype}
+            </h2>
+            <p className="text-sm text-silver">
+              {getConfidenceLabel(confidence)} ({Math.round(confidence * 100)}%)
+            </p>
+          </div>
+
+          {/* Divider */}
+          <div className="mb-6 h-px bg-gradient-to-r from-transparent via-gold-core/30 to-transparent" />
+
+          {/* Footer */}
+          <p className="text-center text-xs text-ash">
+            Discover your place in 120 years of Team USA excellence
+          </p>
+        </div>
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex gap-3">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleDownload}
+          disabled={isGenerating}
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gold-core px-4 py-3 font-medium text-forge-obsidian transition hover:bg-gold-bright disabled:opacity-50"
+        >
+          {isGenerating ? (
+            <>
+              <svg className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              Generating...
+            </>
+          ) : (
+            <>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              Download Card
+            </>
+          )}
+        </motion.button>
+
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={handleCopyLink}
+          className="flex flex-1 items-center justify-center gap-2 rounded-xl border border-forge-graphite bg-forge-steel/50 px-4 py-3 font-medium text-white transition hover:border-gold-core/50 hover:bg-forge-steel"
+        >
+          {copied ? (
+            <>
+              <svg className="h-5 w-5 text-para-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Copied!
+            </>
+          ) : (
+            <>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              </svg>
+              Copy Link
+            </>
+          )}
+        </motion.button>
+      </div>
+    </div>
+  );
+}
