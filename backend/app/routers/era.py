@@ -11,7 +11,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from app.models.archetypes import ARCHETYPES, get_archetype_by_name
+from app.models.archetypes import ARCHETYPES
 from app.tools.era_evolution import era_evolution_tool, EraEvolutionArgs, ERAS, ERA_EVOLUTION_DATA
 
 

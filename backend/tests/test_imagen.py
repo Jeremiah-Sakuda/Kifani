@@ -5,7 +5,6 @@ Tests focus on prompt building, archetype styles, and result handling,
 as actual Imagen calls require GCP credentials.
 """
 
-import pytest
 from app.services.imagen_service import (
     ARCHETYPE_STYLES,
     BASE_PROMPT,

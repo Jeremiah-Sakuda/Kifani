@@ -5,7 +5,6 @@ These tests focus on data structures and result conversion,
 as actual Gemini calls are mocked in dev mode.
 """
 
-import pytest
 from app.services.photo_analysis import (
     PhotoAnalysisResult,
     result_to_dict as photo_result_to_dict,

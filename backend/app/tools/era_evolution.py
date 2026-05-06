@@ -5,7 +5,6 @@ Shows how athletes of a given archetype have evolved across four eras.
 Returns aggregate stats and Gemini-generated era narratives.
 """
 
-import os
 from dataclasses import dataclass
 from typing import Any
 

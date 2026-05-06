@@ -5,7 +5,6 @@ This service ensures all outputs use appropriate hedging language
 per hackathon rules (e.g., "could align with" not "would be good at").
 """
 
-import pytest
 from app.services.conditional_language import (
     get_confidence_level,
     get_language_modifiers,
