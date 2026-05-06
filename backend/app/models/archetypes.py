@@ -215,7 +215,7 @@ ARCHETYPES: list[ArchetypeCentroid] = [
             SportMapping(
                 sport="100m Sprint",
                 events=["100m", "4x100m Relay"],
-                why="Your build suggests the power-to-weight ratio that drives acceleration to top speed in under 10 seconds."
+                why="Your build suggests the explosive power-to-weight ratio shared by athletes who excel at maximum-velocity sprinting."
             ),
             SportMapping(
                 sport="Long Jump",
@@ -318,7 +318,7 @@ ARCHETYPES: list[ArchetypeCentroid] = [
             SportMapping(
                 sport="Swimming",
                 events=["200m–400m Freestyle", "200m IM", "200m Butterfly"],
-                why="Middle-distance swimming rewards larger frames that can sustain stroke power over 2–4 minutes."
+                why="Middle-distance swimming rewards larger frames that can sustain stroke power across multiple pool lengths."
             ),
             SportMapping(
                 sport="Modern Pentathlon",
@@ -403,7 +403,7 @@ ARCHETYPES: list[ArchetypeCentroid] = [
             SportMapping(
                 sport="Wheelchair Marathon",
                 events=["Marathon", "Half Marathon"],
-                why="Wheelchair marathoners sustain aerobic output for 90+ minutes — elite endurance in a racing chair.",
+                why="Wheelchair marathoners sustain elite aerobic output across the full marathon distance in a racing chair.",
                 classification="T53–T54",
                 classification_explainer="T53: Full arm function with some trunk control. T54: Full arm function with better trunk control. Both classes compete in the same marathon event."
             ),

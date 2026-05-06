@@ -24,7 +24,9 @@ frontend/dist/
 Thumbs.db
 
 # Data sources (raw downloaded files — not our curated reference data)
+# These files contain athlete names (NIL) and must not be committed
 data/sources/athlete_events.csv
+data/sources/athlete_events.csv.zip
 data/sources/athletes_cleaned.csv
 data/sources/noc_regions.csv
 data/sources/*.json

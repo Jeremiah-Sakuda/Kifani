@@ -119,7 +119,8 @@ def compute_archetype_match(req: MatchRequest) -> ArchetypeMatchResult:
         confidence = 1.0
 
     # Ensure confidence is in reasonable range
-    confidence = max(0.55, min(0.98, confidence))
+    # Low floor (0.20) allows uncertain matches for outlier builds
+    confidence = max(0.20, min(0.98, confidence))
 
     # Build centroid positions for Digital Mirror visualization
     centroid_positions: dict[str, list[float]] = {}

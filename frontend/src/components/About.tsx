@@ -76,22 +76,23 @@ export default function About() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            <h2 className="mb-4 font-display text-2xl text-white">Clustering Algorithm</h2>
+            <h2 className="mb-4 font-display text-2xl text-white">Archetype Matching</h2>
             <div className="rounded-xl border border-forge-graphite/30 bg-forge-steel/50 p-6 space-y-4">
               <div>
-                <h3 className="font-medium text-gold-core">K-Means Clustering</h3>
+                <h3 className="font-medium text-gold-core">Distance-to-Centroid Matching</h3>
                 <p className="mt-2 text-sm text-smoke">
-                  We apply k-means clustering on three normalized features: height (cm), weight (kg),
-                  and BMI. Features are z-score normalized before clustering to ensure equal weighting.
+                  We compute weighted Euclidean distance to 8 expert-defined archetype centroids using
+                  three normalized features: height (cm), weight (kg), and BMI. Features are z-score
+                  normalized to ensure equal weighting.
                 </p>
               </div>
 
               <div>
-                <h3 className="font-medium text-gold-core">Optimal k Selection</h3>
+                <h3 className="font-medium text-gold-core">8 Archetypes</h3>
                 <p className="mt-2 text-sm text-smoke">
-                  We selected k=8 clusters based on elbow method analysis and silhouette scores.
-                  This number also aligns with domain knowledge: 6 general archetypes plus 2
-                  Paralympic-first archetypes.
+                  6 general archetypes derived from Olympic athlete biometric patterns, plus 2
+                  Paralympic-first archetypes with expert-defined centroids matching Paralympic
+                  sport requirements.
                 </p>
               </div>
 

@@ -129,10 +129,12 @@ async def get_total_athlete_count() -> dict:
         }
     except Exception:
         # Return fallback data if BigQuery unavailable
+        # Note: Olympic athlete data from Olympedia; Paralympic parity achieved
+        # through dedicated archetypes and classification taxonomy, not raw athlete records
         return {
-            "total": 16065,
+            "total": 14218,
             "olympic": 14218,
-            "paralympic": 2847,
+            "paralympic_classifications": 30,  # Classification codes, not athlete records
             "earliest_year": 1896,
             "latest_year": 2024,
             "source": "fallback",

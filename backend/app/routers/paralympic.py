@@ -221,8 +221,8 @@ async def compare_parity(req: ParityComparisonRequest) -> ParityComparison:
                 {"event": "100m", "description": "The ultimate test of human speed"},
             ],
             "paralympic": [
-                {"event": "T64 100m", "classification": "T64", "description": "Running prosthesis — often sub-11 seconds"},
-                {"event": "T54 100m", "classification": "T54", "description": "Wheelchair — often sub-14 seconds"},
+                {"event": "T64 100m", "classification": "T64", "description": "Running prosthesis — elite sprint speeds"},
+                {"event": "T54 100m", "classification": "T54", "description": "Wheelchair — explosive racing chair acceleration"},
                 {"event": "T11 100m", "classification": "T11", "description": "Visual impairment with guide runner"},
             ],
             "note": "Multiple Paralympic 100m classes demonstrate diverse expressions of sprinting excellence.",

@@ -36,20 +36,20 @@ The 8 archetypes include 2 Paralympic-first categories (Adaptive Power, Adaptive
 - **Vertex AI Gemini 2.5 Pro** — Agent orchestration with function calling
 - **Vertex AI Gemini 2.0 Flash** — Photo/voice analysis + conditional language validation
 - **Vertex AI Imagen 3.0** — Non-photorealistic archetype portraits
-- **BigQuery** — 16,065 athlete records (14,218 Olympic + 2,847 Paralympic)
+- **BigQuery** — 14,218 Olympic athlete records + 30+ Paralympic classification taxonomy
 - **Firestore** — Session persistence for multi-turn conversations
 - **Cloud Run** — Serverless deployment with auto-scaling
 - **Cloud Build** — CI/CD pipeline
 
 **Key Technical Features:**
 - Real-time streaming via Server-Sent Events (SSE)
-- K-means clustering with Paralympic sample weighting (1.15x)
+- Distance-to-centroid matching with 8 expert-defined archetypes
 - Conditional language validation layer ensuring "could align with" phrasing
 - Multimodal input (photo, voice, form)
 
 ## Challenges we ran into
 
-1. **Paralympic parity** — The Paralympic dataset is smaller. We solved this with inverse sample weighting (1.15x) so Paralympic archetypes appear with equal probability despite fewer data points.
+1. **Paralympic parity** — While Paralympic athlete biometric data is less available than Olympic data, we achieved structural parity through dedicated Paralympic-first archetypes, expert-defined centroids, and comprehensive classification documentation.
 
 2. **Conditional language** — The rules require avoiding definitive claims. We built a separate Gemini Flash validation pass that rewrites any "you would" statements to "you could" before display.
 
@@ -59,7 +59,7 @@ The 8 archetypes include 2 Paralympic-first categories (Adaptive Power, Adaptive
 
 ## Accomplishments that we're proud of
 
-- **Structural Paralympic parity** — Not a checkbox feature. 2 dedicated Paralympic-first archetypes, 30+ classification code explainers, side-by-side parity comparisons, and 1.15x weighted clustering.
+- **Structural Paralympic parity** — Not a checkbox feature. 2 dedicated Paralympic-first archetypes, 30+ classification code explainers, side-by-side parity comparisons, and equal analytical depth.
 - **Era Time Machine** — D3.js visualization of 120 years of athlete evolution with per-archetype statistics across 4 historical eras.
 - **Real agentic architecture** — 4 specialized tools with visible reasoning trace, not simulated loading spinners.
 - **Imagen Digital Mirror** — The stylized portrait reveal creates a memorable moment.

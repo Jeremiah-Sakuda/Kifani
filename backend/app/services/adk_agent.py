@@ -22,6 +22,7 @@ from vertexai.generative_models import (
 )
 
 from app.prompts.system_prompt import SYSTEM_PROMPT
+from app.services.conditional_validator import validate_conditional_language
 from app.tools.match_archetype import (
     match_archetype_tool,
     MatchArchetypeArgs,
@@ -58,6 +59,7 @@ class EventType(str, Enum):
     THINKING = "thinking"
     TOOL_CALL = "tool_call"
     TOOL_RESULT = "tool_result"
+    VALIDATION = "validation"
     RESPONSE = "response"
     ERROR = "error"
     COMPLETE = "complete"
@@ -291,11 +293,29 @@ async def run_agent_stream(
                 final_result = final_text
                 break
 
-        # Yield final response
+        # Validate conditional language with Gemini Flash
         if final_result:
             yield StreamEvent(
+                event_type=EventType.VALIDATION,
+                data={"message": "Validating conditional language compliance..."}
+            )
+
+            validation_result = await validate_conditional_language(final_result)
+
+            # Yield validation trace for transparency
+            yield StreamEvent(
+                event_type=EventType.VALIDATION,
+                data={
+                    "message": "Validation complete",
+                    "was_modified": validation_result.was_modified,
+                    "trace": validation_result.validation_trace,
+                }
+            )
+
+            # Yield final response with validated text
+            yield StreamEvent(
                 event_type=EventType.RESPONSE,
-                data={"narrative": final_result}
+                data={"narrative": validation_result.validated_text}
             )
 
         # Yield completion event

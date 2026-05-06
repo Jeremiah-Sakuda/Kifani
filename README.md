@@ -97,7 +97,7 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
         ▼                     ▼                     ▼
 ┌──────────────┐     ┌──────────────┐      ┌──────────────┐
 │   Vertex AI  │     │   BigQuery   │      │  Firestore   │
-│  Gemini/Imagen│    │ 16K athletes │      │   Sessions   │
+│  Gemini/Imagen│    │ 14K athletes │      │   Sessions   │
 └──────────────┘     └──────────────┘      └──────────────┘
 ```
 
@@ -110,7 +110,7 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 | **Vertex AI — Gemini 2.5 Pro** | Agent orchestration with 4-tool function calling |
 | **Vertex AI — Gemini 2.0 Flash** | Photo analysis, voice transcription, conditional language validation |
 | **Vertex AI — Imagen 3.0** | Non-photorealistic archetype portrait generation |
-| **BigQuery** | 16,065 athlete records (14,218 Olympic + 2,847 Paralympic) |
+| **BigQuery** | 14,218 Olympic athlete records + 30+ Paralympic classification taxonomy |
 | **Firestore** | Session persistence for multi-turn conversations |
 | **Cloud Run** | Serverless deployment (auto-scaling 0-10 instances) |
 | **Cloud Build** | CI/CD pipeline (8-step build and deploy) |
@@ -121,7 +121,7 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 ## Key Differentiators
 
 ### 1. Structural Paralympic Parity
-Not a checkbox feature — Paralympic athletes are weighted 1.15x in clustering to ensure equal representation despite smaller dataset. Two archetypes (Adaptive Power, Adaptive Endurance) are Paralympic-first. 30+ classification codes documented with full explanations.
+Not a checkbox feature — Two archetypes (Adaptive Power, Adaptive Endurance) are Paralympic-first, with expert-defined centroids matching Paralympic sport requirements. 30+ classification codes documented with full explanations, providing equal analytical depth to Paralympic sports.
 
 ### 2. Real Agentic Orchestration
 Gemini 2.5 Pro with function calling orchestrates 4 specialized tools. Server-Sent Events stream the reasoning trace in real-time. Not simulated loading spinners — actual tool execution visible to users.
