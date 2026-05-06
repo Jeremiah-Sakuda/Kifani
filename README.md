@@ -10,10 +10,9 @@ A Gemini-powered fan engagement tool that matches users to Team USA Olympic and 
 
 ## Live Demo
 
-*URLs will be populated after Cloud Run deployment. Run `gcloud builds submit --config=cloudbuild.yaml` to deploy.*
-
-- **Frontend:** `https://forged-frontend-<PROJECT_HASH>.run.app`
-- **Backend API:** `https://forged-backend-<PROJECT_HASH>.run.app`
+- **Frontend:** https://forged-frontend-481161735332.us-central1.run.app
+- **Backend API:** https://forged-backend-481161735332.us-central1.run.app
+- **GitHub:** https://github.com/Jeremiah-Sakuda/Kifani
 
 ---
 
@@ -40,6 +39,15 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 - **Digital Mirror** — D3.js scatter plot + Imagen-generated stylized portrait
 - **Paralympic Parity** — Olympic and Paralympic athletes weighted equally; classification depth matches Olympic analysis
 - **Conversational Follow-ups** — Multi-turn Gemini agent for deeper exploration
+- **Real-time Processing** — Server-Sent Events stream the Gemini reasoning trace live
+- **Confidence Scoring** — Each match includes a confidence percentage with explanations
+
+### Additional Features
+
+- **Paralympic Spotlight** — Browse 30+ Paralympic classification codes with detailed explanations
+- **Era Time Machine** — D3.js visualization showing how archetypes evolved across 4 historical eras (1896–1950, 1950–1980, 1980–2000, 2000+)
+- **Parity Comparison** — Side-by-side Olympic/Paralympic sport alignment views
+- **Conditional Language** — All outputs use hedged phrasing ("could align with") per hackathon rules
 
 ### The 8 Archetypes
 
@@ -153,35 +161,60 @@ Each archetype has a unique Imagen-generated stylized portrait. Non-photorealist
 ```
 ├── backend/
 │   ├── app/
-│   │   ├── main.py              # FastAPI application
+│   │   ├── main.py                    # FastAPI application with CORS
 │   │   ├── models/
-│   │   │   ├── archetypes.py    # 8 archetype definitions
-│   │   │   └── schemas.py       # Pydantic models
-│   │   ├── routers/             # API endpoints
+│   │   │   ├── archetypes.py          # 8 archetype definitions with biometric centroids
+│   │   │   └── schemas.py             # Pydantic request/response models
+│   │   ├── routers/
+│   │   │   ├── match.py               # Direct archetype matching
+│   │   │   ├── stream.py              # SSE streaming endpoint
+│   │   │   ├── chat.py                # Multi-turn conversation
+│   │   │   ├── multimodal.py          # Photo/voice analysis
+│   │   │   ├── paralympic.py          # Classification exploration
+│   │   │   └── era.py                 # Historical era evolution
 │   │   ├── services/
-│   │   │   ├── adk_agent.py     # Gemini 2.5 Pro orchestration
-│   │   │   ├── clustering.py    # K-means matching
-│   │   │   ├── imagen_service.py # Portrait generation
-│   │   │   └── ...
-│   │   └── tools/               # ADK tool implementations
-│   ├── tests/
+│   │   │   ├── adk_agent.py           # Gemini 2.5 Pro orchestration
+│   │   │   ├── clustering.py          # K-means matching algorithm
+│   │   │   ├── conditional_language.py # Compliance phrasing layer
+│   │   │   ├── imagen_service.py      # Portrait generation
+│   │   │   ├── photo_analysis.py      # Gemini Vision processing
+│   │   │   ├── voice_analysis.py      # Audio transcription
+│   │   │   ├── firestore_service.py   # Session persistence
+│   │   │   └── gemini_agent.py        # Chat agent
+│   │   └── tools/                     # ADK tool implementations
+│   │       ├── match_archetype.py
+│   │       ├── classify_paralympic.py
+│   │       └── era_evolution.py
+│   ├── tests/                         # Pytest test suite
 │   ├── Dockerfile
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── Landing.tsx
-│   │   │   ├── Processing.tsx   # SSE streaming UI
-│   │   │   ├── Results.tsx
-│   │   │   ├── DigitalMirror.tsx # D3 visualization
+│   │   │   ├── Landing.tsx            # Hero + input mode selector
+│   │   │   ├── Processing.tsx         # Real-time SSE reasoning trace
+│   │   │   ├── Results.tsx            # Archetype reveal + sports
+│   │   │   ├── DigitalMirror.tsx      # D3.js scatter plot
+│   │   │   ├── MirrorReveal.tsx       # Imagen portrait animation
+│   │   │   ├── ConfidenceMeter.tsx    # Match confidence display
+│   │   │   ├── ChatInterface.tsx      # Follow-up conversation
+│   │   │   ├── ParalympicExplorer.tsx # Classification browser
+│   │   │   ├── EraTimeline.tsx        # Historical evolution
 │   │   │   └── ...
-│   │   ├── services/api.ts
-│   │   └── App.tsx
+│   │   ├── hooks/
+│   │   │   ├── useStreamMatch.ts      # SSE event handling
+│   │   │   └── useChat.ts             # Chat state management
+│   │   ├── services/api.ts            # Type-safe API client
+│   │   └── App.tsx                    # Router configuration
 │   ├── Dockerfile
 │   └── package.json
-├── cloudbuild.yaml              # Cloud Build CI/CD
-├── docker-compose.yml           # Local development
-└── LICENSE                      # Apache 2.0
+├── .github/workflows/ci.yml           # GitHub Actions CI/CD
+├── cloudbuild.yaml                    # Cloud Build pipeline
+├── docker-compose.yml                 # Local development
+├── GCP_SETUP.md                       # Google Cloud setup guide
+├── DEPLOYMENT.md                      # Deployment documentation
+├── CONTRIBUTING.md                    # Developer guidelines
+└── LICENSE                            # Apache 2.0
 ```
 
 ---
@@ -259,11 +292,16 @@ cd frontend && npm run typecheck
 | Method | Path | Description |
 |--------|------|-------------|
 | `POST` | `/api/match` | Direct archetype matching |
-| `GET` | `/api/stream/match` | Streaming match with SSE |
-| `POST` | `/api/chat` | Follow-up conversation |
-| `POST` | `/api/analyze/photo/base64` | Photo analysis |
-| `POST` | `/api/analyze/voice/base64` | Voice analysis |
-| `POST` | `/api/imagen/portrait` | Generate archetype portrait |
+| `POST` | `/api/stream/match` | Streaming match with SSE (real-time reasoning trace) |
+| `POST` | `/api/chat` | Follow-up conversation with Gemini |
+| `POST` | `/api/analyze/photo/base64` | Photo analysis via Gemini Vision |
+| `POST` | `/api/analyze/voice/base64` | Voice transcription and parsing |
+| `POST` | `/api/imagen/portrait` | Generate Imagen archetype portrait |
+| `GET` | `/api/paralympic/classifications` | List all Paralympic classification codes |
+| `GET` | `/api/paralympic/classifications/{code}` | Get details for specific classification |
+| `GET` | `/api/era/list` | List available historical eras |
+| `GET` | `/api/era/evolution/{archetype}` | Get archetype evolution across eras |
+| `GET` | `/api/session/{session_id}` | Retrieve session results |
 | `GET` | `/health` | Health check |
 
 ---

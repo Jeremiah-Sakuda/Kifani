@@ -43,14 +43,25 @@ gcloud services enable \
   artifactregistry.googleapis.com
 ```
 
-### 3. Authenticate
+### 3. Create Firestore Database
+
+Firestore is required for session persistence and chat history:
+
+```bash
+# Create Firestore database in Native mode
+gcloud firestore databases create --location=us-central1
+```
+
+**Note:** If you see "Cloud Firestore API has not been used" errors, ensure the Firestore database is created before deploying.
+
+### 4. Authenticate
 
 ```bash
 gcloud auth login
 gcloud auth application-default login
 ```
 
-### 4. Set IAM Permissions
+### 5. Set IAM Permissions
 
 Ensure the Cloud Build and Cloud Run service accounts have necessary permissions:
 
@@ -380,7 +391,29 @@ Note: This increases costs as instances run continuously.
 
 ## CI/CD Setup
 
-### Option 1: Cloud Build Triggers (Recommended)
+### Automated Deployment via GitHub Actions (Current Setup)
+
+The repository uses GitHub Actions with Workload Identity Federation for secure, keyless authentication to Google Cloud. Deployment is triggered automatically on every push to `main`.
+
+**Required GitHub Secrets:**
+
+| Secret | Description |
+|--------|-------------|
+| `GCP_PROJECT_ID` | Google Cloud project ID (e.g., `akili-9d5fe`) |
+| `WIF_PROVIDER` | Workload Identity Provider path |
+| `WIF_SERVICE_ACCOUNT` | Service account email for deployment |
+
+**Pipeline Steps:**
+1. Run backend tests (pytest)
+2. Run frontend tests (vitest)
+3. Run integration check
+4. Build and push Docker images
+5. Deploy backend to Cloud Run
+6. Deploy frontend to Cloud Run (with backend URL injected)
+
+See [GCP_SETUP.md](GCP_SETUP.md) for complete Workload Identity Federation setup instructions.
+
+### Alternative: Cloud Build Triggers
 
 1. Go to [Cloud Build Triggers](https://console.cloud.google.com/cloud-build/triggers)
 2. Click "Create Trigger"
@@ -392,34 +425,11 @@ Note: This increases costs as instances run continuously.
    - **Location:** `cloudbuild.yaml`
 5. Save trigger
 
-### Option 2: GitHub Actions
+### Manual Deployment
 
-Add deployment to `.github/workflows/ci.yml`:
-
-```yaml
-deploy:
-  runs-on: ubuntu-latest
-  needs: [backend-tests, frontend-tests]
-  if: github.ref == 'refs/heads/main'
-
-  steps:
-    - uses: actions/checkout@v4
-
-    - uses: google-github-actions/auth@v2
-      with:
-        credentials_json: ${{ secrets.GCP_SA_KEY }}
-
-    - uses: google-github-actions/setup-gcloud@v2
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-
-    - name: Deploy to Cloud Run
-      run: gcloud builds submit --config=cloudbuild.yaml
+```bash
+gcloud builds submit --config=cloudbuild.yaml
 ```
-
-Required GitHub Secrets:
-- `GCP_PROJECT_ID`: Your Google Cloud project ID
-- `GCP_SA_KEY`: Service account JSON key with Cloud Build and Cloud Run permissions
 
 ---
 

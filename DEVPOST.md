@@ -105,6 +105,6 @@ The 8 archetypes include 2 Paralympic-first categories (Adaptive Power, Adaptive
 
 ## Try It Out
 
-- **Live Demo:** <!-- TODO: Add deployed frontend URL before submission -->
+- **Live Demo:** https://forged-frontend-481161735332.us-central1.run.app
 - **GitHub:** https://github.com/Jeremiah-Sakuda/Kifani
-- **Video:** <!-- TODO: Add unlisted YouTube video URL before submission -->
+- **Video:** <!-- Add unlisted YouTube video URL before submission -->
