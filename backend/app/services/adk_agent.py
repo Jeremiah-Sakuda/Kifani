@@ -261,13 +261,13 @@ async def run_agent_stream(
                             }
                         )
 
-                        # Build function response
-                        function_responses.append({
-                            "function_response": {
-                                "name": fn_name,
-                                "response": result,
-                            }
-                        })
+                        # Build function response as Part object
+                        function_responses.append(
+                            Part.from_function_response(
+                                name=fn_name,
+                                response=result,
+                            )
+                        )
 
             if has_function_call:
                 # Send function results back to Gemini
@@ -276,9 +276,8 @@ async def run_agent_stream(
                     data={"message": "Processing tool results..."}
                 )
 
-                # Send all function responses
-                for fn_response in function_responses:
-                    response = chat.send_message(fn_response, tools=[tools])
+                # Send all function responses together as a single message
+                response = chat.send_message(function_responses, tools=[tools])
             else:
                 # No function calls — we have the final response
                 final_text = response.text if hasattr(response, 'text') else ""
