@@ -6,7 +6,6 @@ using Vertex AI's explicit context caching for production efficiency.
 """
 
 import os
-import json
 from typing import Any
 from functools import lru_cache
 

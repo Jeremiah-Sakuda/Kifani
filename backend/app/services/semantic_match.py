@@ -262,7 +262,7 @@ def compute_dual_match(
             result["semantic_match"] = {
                 "archetype": semantic_primary["archetype"],
                 "confidence": semantic_primary["confidence"],
-                "method": f"text-embedding-005 cosine similarity",
+                "method": "text-embedding-005 cosine similarity",
             }
 
             # Check if signals agree
