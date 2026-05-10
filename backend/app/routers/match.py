@@ -14,7 +14,6 @@ from fastapi import APIRouter, HTTPException
 from app.models.schemas import (
     MatchRequest,
     MatchResponse,
-    SecondaryArchetype,
     ValidationTrace,
 )
 from app.services.clustering import (

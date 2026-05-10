@@ -15,7 +15,6 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.services.adk_agent import run_agent_stream, StreamEvent
-from app.models.schemas import ValidationTrace, SecondaryArchetype
 
 router = APIRouter()
 
