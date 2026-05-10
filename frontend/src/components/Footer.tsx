@@ -39,6 +39,12 @@ export default function Footer() {
             >
               About & Methodology
             </Link>
+            <Link
+              to="/how-it-works"
+              className="text-ash transition hover:text-gold-core"
+            >
+              How It Works
+            </Link>
           </nav>
 
           {/* Partner Logos / Credits */}
