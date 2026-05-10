@@ -11,6 +11,7 @@ export interface MatchRequest {
   arm_span_cm?: number;
   age_range?: string;
   activity_preference?: string[];
+  paralympic_discovery?: boolean; // Enable Paralympic Discovery Mode
 }
 
 export interface SportMatch {
@@ -93,6 +94,25 @@ export interface StreamEvent {
   data: Record<string, unknown>;
 }
 
+// Validation trace for Gemini auditing Gemini transparency
+export interface ValidationTrace {
+  model: string;
+  input_length: number;
+  output_length: number;
+  was_modified: boolean;
+  modifications: string[];
+  latency_ms: number;
+  validation_summary: string;
+}
+
+// Secondary archetype for discovery panel
+export interface SecondaryArchetype {
+  name: string;
+  confidence: number;
+  description: string;
+  is_paralympic_first: boolean;
+}
+
 export interface StreamSessionResult {
   session_id: string;
   primary_archetype: {
@@ -103,7 +123,10 @@ export interface StreamSessionResult {
     mean_height_cm?: number;
     mean_weight_kg?: number;
     athlete_count?: number;
+    insight?: string; // Non-obvious analytical insight
+    is_paralympic_first?: boolean;
   };
+  secondary_archetypes?: SecondaryArchetype[]; // For discovery panel
   ranked_archetypes?: Array<{
     name: string;
     match_strength: number;
@@ -120,6 +143,8 @@ export interface StreamSessionResult {
   };
   centroid_positions?: Record<string, number[]>;
   narrative: string;
+  validation_trace?: ValidationTrace; // Gemini auditing Gemini
+  paralympic_discovery_mode?: boolean;
 }
 
 /**
