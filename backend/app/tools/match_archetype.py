@@ -14,6 +14,7 @@ from app.services.conditional_language import (
     enrich_match_result_with_language,
     get_confidence_aware_prompt_injection,
 )
+from app.services.semantic_match import compute_dual_match
 from app.models.schemas import MatchRequest
 
 
@@ -25,6 +26,7 @@ class MatchArchetypeArgs:
     arm_span_cm: float | None = None
     activity_preferences: list[str] | None = None
     paralympic_discovery: bool = False  # Enable Paralympic Discovery Mode
+    self_description: str | None = None  # Optional natural-language description for semantic match
 
 
 def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
@@ -101,6 +103,15 @@ def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
         "paralympic_discovery_mode": args.paralympic_discovery,
     }
 
+    # Add dual matching if self_description provided
+    if args.self_description:
+        dual_result = compute_dual_match(
+            biometric_archetype=archetype.name,
+            biometric_confidence=confidence,
+            user_description=args.self_description,
+        )
+        base_result["dual_match"] = dual_result
+
     # Enrich with confidence-aware language context
     enriched_result = enrich_match_result_with_language(base_result)
 
@@ -124,6 +135,11 @@ with confidence scores and sport alignments.
 The tool uses k-means clustering on normalized biometric vectors. Paralympic
 archetype data is sample-weighted to achieve structural parity despite smaller
 sample sizes in the historical record.
+
+DUAL MATCHING: If user provides a natural-language self_description of their
+athletic style, the tool also performs semantic matching using text-embedding-005
+and returns both biometric and narrative match confidences. When both signals
+agree, this provides stronger confidence in the match.
 """
 
 TOOL_PARAMETERS = {
@@ -149,6 +165,10 @@ TOOL_PARAMETERS = {
         "paralympic_discovery": {
             "type": "boolean",
             "description": "Enable Paralympic Discovery Mode to prioritize Para sport alignments"
+        },
+        "self_description": {
+            "type": "string",
+            "description": "Optional natural-language description of athletic style for semantic matching (e.g., 'I enjoy endurance sports and long-distance running')"
         },
     },
     "required": ["height_cm", "weight_kg"],

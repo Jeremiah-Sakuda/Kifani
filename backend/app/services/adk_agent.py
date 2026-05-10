@@ -134,6 +134,7 @@ def _execute_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
             arm_span_cm=args.get("arm_span_cm"),
             activity_preferences=args.get("activity_preferences"),
             paralympic_discovery=args.get("paralympic_discovery", False),
+            self_description=args.get("self_description"),
         )
         return match_archetype_tool(tool_args)
 
