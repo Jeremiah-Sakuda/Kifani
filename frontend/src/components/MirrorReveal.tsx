@@ -30,11 +30,22 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
 
   useEffect(() => {
     let cancelled = false;
+    let timeoutId: ReturnType<typeof setTimeout>;
 
     async function loadPortrait() {
       try {
+        // Set a timeout - if generation takes too long, show placeholder
+        timeoutId = setTimeout(() => {
+          if (!cancelled && state === "loading") {
+            console.warn("Portrait generation timed out, showing abstract visualization");
+            setIsPlaceholder(true);
+            setState("ready");
+          }
+        }, 15000); // 15 second timeout
+
         const result = await generatePortrait(archetype, sessionId);
 
+        clearTimeout(timeoutId);
         if (cancelled) return;
 
         if (result.success && result.image_data) {
@@ -42,13 +53,18 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
           setIsPlaceholder(result.is_placeholder || false);
           setState("ready");
         } else {
-          setError(result.error || "Failed to generate portrait");
-          setState("error");
+          // On error, show abstract visualization instead of blocking
+          console.warn("Portrait generation failed:", result.error);
+          setIsPlaceholder(true);
+          setState("ready"); // Still show "ready" state with abstract visualization
         }
       } catch (err) {
+        clearTimeout(timeoutId);
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : "Failed to load portrait");
-        setState("error");
+        // On error, show abstract visualization
+        console.warn("Portrait generation error:", err);
+        setIsPlaceholder(true);
+        setState("ready"); // Show abstract visualization instead of error
       }
     }
 
@@ -56,8 +72,9 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
 
     return () => {
       cancelled = true;
+      clearTimeout(timeoutId);
     };
-  }, [archetype, sessionId]);
+  }, [archetype, sessionId, state]);
 
   const handleReveal = () => {
     setState("revealed");
