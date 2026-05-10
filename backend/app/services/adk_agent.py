@@ -106,6 +106,10 @@ def _build_tools() -> Tool:
     )
 
 
+# Confidence threshold for second-opinion routing
+SECOND_OPINION_THRESHOLD = 0.60
+
+
 # ── Tool Handlers ──
 
 def _execute_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
@@ -116,6 +120,7 @@ def _execute_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
             weight_kg=args["weight_kg"],
             arm_span_cm=args.get("arm_span_cm"),
             activity_preferences=args.get("activity_preferences"),
+            paralympic_discovery=args.get("paralympic_discovery", False),
         )
         return match_archetype_tool(tool_args)
 
@@ -239,13 +244,14 @@ async def run_agent_stream(
                         fn_name = fn_call.name
                         fn_args = dict(fn_call.args)
 
-                        # Yield tool call event
+                        # Yield tool call event with enhanced observability
                         yield StreamEvent(
                             event_type=EventType.TOOL_CALL,
                             data={
                                 "tool": fn_name,
                                 "args": fn_args,
                                 "description": _get_tool_description(fn_name),
+                                "purpose": _get_tool_purpose(fn_name),
                             }
                         )
 
@@ -253,13 +259,17 @@ async def run_agent_stream(
                         await asyncio.sleep(0.1)  # Small delay for UI
                         result = _execute_tool(fn_name, fn_args)
 
-                        # Yield tool result event
+                        # Yield tool result event with enhanced observability
                         yield StreamEvent(
                             event_type=EventType.TOOL_RESULT,
                             data={
                                 "tool": fn_name,
                                 "result_summary": _summarize_result(fn_name, result),
                                 "full_result": result,
+                                # Additional observability fields
+                                "confidence": result.get("primary_archetype", {}).get("confidence"),
+                                "athlete_count": result.get("primary_archetype", {}).get("athlete_count"),
+                                "row_count": len(result.get("ranked_archetypes", [])),
                             }
                         )
 
@@ -337,6 +347,7 @@ def _build_match_prompt(user_input: dict[str, Any]) -> str:
     weight = user_input.get("weight_kg", 0)
     arm_span = user_input.get("arm_span_cm")
     preferences = user_input.get("activity_preferences", [])
+    paralympic_discovery = user_input.get("paralympic_discovery", False)
 
     prompt_parts = [
         "Analyze this user's profile and match them to a Team USA athlete archetype:",
@@ -350,13 +361,20 @@ def _build_match_prompt(user_input: dict[str, Any]) -> str:
     if preferences:
         prompt_parts.append(f"- Activity preferences: {', '.join(preferences)}")
 
+    if paralympic_discovery:
+        prompt_parts.append("- Mode: Paralympic Discovery (prioritize Paralympic sport alignments)")
+
     prompt_parts.extend([
         "",
-        "Use the match_archetype tool to determine their archetype, then provide:",
+        f"Use the match_archetype tool with paralympic_discovery={paralympic_discovery} to determine their archetype, then provide:",
         "1. Their primary archetype with confidence score",
         "2. Olympic sports that align with their build",
         "3. Paralympic sports that align with their build (with equal depth)",
         "4. Historical context about this archetype in Team USA history",
+        "",
+        f"IMPORTANT: If the initial match confidence is below {SECOND_OPINION_THRESHOLD:.0%}, "
+        "call match_archetype again to get a second opinion with a broader perspective. "
+        "Present both results to show the user their profile spans multiple archetypes.",
         "",
         "Remember to use conditional language ('could align with', 'suggests') per the rules.",
     ])
@@ -367,12 +385,23 @@ def _build_match_prompt(user_input: dict[str, Any]) -> str:
 def _get_tool_description(tool_name: str) -> str:
     """Get a human-readable description for a tool call."""
     descriptions = {
-        "match_archetype": "Matching your build to Team USA archetypes",
-        "classify_paralympic": "Analyzing Paralympic classification depth",
-        "regional_context": "Checking regional archetype patterns",
-        "generate_followups": "Generating personalized follow-up questions",
+        "match_archetype": "Computing biometric distance to 8 archetype centroids",
+        "classify_paralympic": "Looking up Paralympic classification codes and eligibility",
+        "regional_context": "Querying regional athlete data from BigQuery",
+        "generate_followups": "Creating personalized follow-up questions",
     }
     return descriptions.get(tool_name, f"Running {tool_name}")
+
+
+def _get_tool_purpose(tool_name: str) -> str:
+    """Get the technical purpose of a tool for trace display."""
+    purposes = {
+        "match_archetype": "K-means clustering against 8 archetype centroids with sample weighting",
+        "classify_paralympic": "IPC classification taxonomy lookup with 30+ codes",
+        "regional_context": "BigQuery aggregation of athlete data by region",
+        "generate_followups": "Context-aware question generation based on archetype and conversation",
+    }
+    return purposes.get(tool_name, "Processing")
 
 
 def _summarize_result(tool_name: str, result: dict[str, Any]) -> str:
