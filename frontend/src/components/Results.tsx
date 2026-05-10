@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import {
   getSessionResult,
   getStreamSessionResult,
@@ -422,12 +423,11 @@ export default function Results() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
-            className="relative mb-8 overflow-hidden rounded-2xl bg-forge-charcoal/60 p-8 backdrop-blur-sm"
+            className="relative mb-8 overflow-hidden rounded-2xl bg-forge-charcoal/60 p-6 backdrop-blur-sm md:p-8"
           >
-            <div className="absolute left-0 top-0 h-full w-1 bg-gradient-to-b from-gold-core via-gold-core/50 to-transparent" />
-            <p className="pl-6 font-display text-xl italic leading-relaxed text-silver">
-              "{result.narrative}"
-            </p>
+            <div className="prose prose-invert prose-sm max-w-none md:prose-base prose-headings:font-display prose-headings:text-gold-core prose-h3:text-lg prose-p:text-silver prose-strong:text-white prose-li:text-smoke prose-ul:my-2 prose-li:my-0.5">
+              <ReactMarkdown>{result.narrative}</ReactMarkdown>
+            </div>
           </motion.section>
         )}
 
