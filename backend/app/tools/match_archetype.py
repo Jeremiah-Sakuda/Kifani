@@ -24,6 +24,7 @@ class MatchArchetypeArgs:
     weight_kg: float
     arm_span_cm: float | None = None
     activity_preferences: list[str] | None = None
+    paralympic_discovery: bool = False  # Enable Paralympic Discovery Mode
 
 
 def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
@@ -32,6 +33,9 @@ def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
 
     Uses k-means clustering on normalized biometric vectors.
     Paralympic data is sample-weighted for structural parity.
+
+    In Paralympic Discovery Mode, Paralympic-first archetypes receive
+    additional weighting to prioritize Para sport alignment in results.
 
     Args:
         args: User biometric data including height, weight, optional arm span
@@ -51,8 +55,8 @@ def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
         activity_preference=args.activity_preferences,
     )
 
-    # Compute archetype match
-    result = compute_archetype_match(req)
+    # Compute archetype match with optional Paralympic Discovery boost
+    result = compute_archetype_match(req, paralympic_discovery=args.paralympic_discovery)
 
     archetype = result["archetype"]
     confidence = result["confidence"]
@@ -84,6 +88,8 @@ def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
             "mean_height_cm": archetype.mean_height_cm,
             "mean_weight_kg": archetype.mean_weight_kg,
             "athlete_count": archetype.athlete_count,
+            "insight": getattr(archetype, "insight", None),  # Non-obvious analytical insight
+            "is_paralympic_first": len(archetype.sports_olympic) == 0,
         },
         "ranked_archetypes": ranked,
         "sport_alignments": sports,
@@ -92,6 +98,7 @@ def match_archetype_tool(args: MatchArchetypeArgs) -> dict[str, Any]:
             "position": result["user_position"],
         },
         "centroid_positions": result["centroid_positions"],
+        "paralympic_discovery_mode": args.paralympic_discovery,
     }
 
     # Enrich with confidence-aware language context
@@ -138,6 +145,10 @@ TOOL_PARAMETERS = {
             "type": "array",
             "items": {"type": "string"},
             "description": "Optional list of activity preferences (e.g., ['strength', 'endurance'])"
+        },
+        "paralympic_discovery": {
+            "type": "boolean",
+            "description": "Enable Paralympic Discovery Mode to prioritize Para sport alignments"
         },
     },
     "required": ["height_cm", "weight_kg"],
