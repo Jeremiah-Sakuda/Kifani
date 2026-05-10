@@ -3,6 +3,7 @@ FORGED — SSE Streaming endpoint for real-time reasoning trace.
 
 Provides Server-Sent Events (SSE) stream of agent reasoning,
 tool calls, and results for the Processing screen UI.
+Includes validation trace for Gemini auditing Gemini transparency.
 """
 
 import os
@@ -14,6 +15,7 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
 from app.services.adk_agent import run_agent_stream, StreamEvent
+from app.models.schemas import ValidationTrace, SecondaryArchetype
 
 router = APIRouter()
 
@@ -29,6 +31,7 @@ class StreamMatchRequest(BaseModel):
     weight_kg: float = Field(..., gt=0, description="Weight in kilograms")
     arm_span_cm: float | None = Field(None, gt=0, description="Arm span in centimeters")
     activity_preferences: list[str] | None = Field(None, description="Activity preferences")
+    paralympic_discovery: bool = Field(False, description="Enable Paralympic Discovery Mode")
 
 
 class StreamChatRequest(BaseModel):
@@ -90,6 +93,9 @@ async def stream_match(req: StreamMatchRequest):
         "messages": [],
         "match_result": None,
         "narrative": None,
+        "validation_trace": None,
+        "secondary_archetypes": [],
+        "paralympic_discovery_mode": req.paralympic_discovery,
     }
 
     user_input = {
@@ -97,6 +103,7 @@ async def stream_match(req: StreamMatchRequest):
         "weight_kg": req.weight_kg,
         "arm_span_cm": req.arm_span_cm,
         "activity_preferences": req.activity_preferences,
+        "paralympic_discovery": req.paralympic_discovery,
     }
 
     if DEV_MODE:
@@ -159,7 +166,8 @@ async def get_stream_session(session_id: str):
     """
     Retrieve session data after streaming completes.
 
-    Returns the final match result and narrative for the Results page.
+    Returns the final match result, narrative, validation trace, and
+    secondary archetypes for the Results page.
     """
     session = _stream_sessions.get(session_id)
     if not session:
@@ -174,11 +182,14 @@ async def get_stream_session(session_id: str):
     return {
         "session_id": session_id,
         "primary_archetype": primary,
+        "secondary_archetypes": session.get("secondary_archetypes", []),
         "ranked_archetypes": match_result.get("ranked_archetypes", []),
         "sport_alignments": match_result.get("sport_alignments", {}),
         "user_metrics": match_result.get("user_metrics", {}),
         "centroid_positions": match_result.get("centroid_positions", {}),
         "narrative": narrative,
+        "validation_trace": session.get("validation_trace"),
+        "paralympic_discovery_mode": session.get("paralympic_discovery_mode", False),
     }
 
 
@@ -196,11 +207,18 @@ async def _mock_stream_events(
     from app.tools.match_archetype import match_archetype_tool, MatchArchetypeArgs
     from app.tools.classify_paralympic import classify_paralympic_tool, ClassifyParalympicArgs
     from app.tools.generate_followups import generate_followups_tool, GenerateFollowupsArgs
+    from app.services.conditional_validator import validate_conditional_language
+
+    paralympic_discovery = user_input.get("paralympic_discovery", False)
 
     # Thinking event
+    thinking_msg = "Analyzing your profile against Team USA archetypes..."
+    if paralympic_discovery:
+        thinking_msg = "Paralympic Discovery Mode: Prioritizing Paralympic sport alignments..."
+
     yield StreamEvent(
         event_type=EventType.THINKING,
-        data={"message": "Analyzing your profile against Team USA archetypes..."}
+        data={"message": thinking_msg}
     )
     await asyncio.sleep(0.5)
 
@@ -212,18 +230,21 @@ async def _mock_stream_events(
             "args": {
                 "height_cm": user_input["height_cm"],
                 "weight_kg": user_input["weight_kg"],
+                "paralympic_discovery": paralympic_discovery,
             },
+            "purpose": "Computing biometric distance to 8 archetype centroids",
             "description": "Matching your build to Team USA archetypes",
         }
     )
     await asyncio.sleep(0.3)
 
-    # Execute match
+    # Execute match with Paralympic discovery mode
     match_args = MatchArchetypeArgs(
         height_cm=user_input["height_cm"],
         weight_kg=user_input["weight_kg"],
         arm_span_cm=user_input.get("arm_span_cm"),
         activity_preferences=user_input.get("activity_preferences"),
+        paralympic_discovery=paralympic_discovery,
     )
     match_result = match_archetype_tool(match_args)
 
@@ -307,17 +328,73 @@ async def _mock_stream_events(
     olympic_sports = sports.get("olympic_sports", [])
     paralympic_sports = sports.get("paralympic_sports", [])
 
-    olympic_list = ", ".join([s["sport"] for s in olympic_sports[:2]]) if olympic_sports else "various Olympic events"
-    paralympic_list = ", ".join([s["sport"] for s in paralympic_sports[:2]]) if paralympic_sports else "various Paralympic events"
+    # In Paralympic Discovery Mode, lead with Paralympic sports
+    if paralympic_discovery:
+        paralympic_list = ", ".join([s["sport"] for s in paralympic_sports[:2]]) if paralympic_sports else "various Paralympic events"
+        olympic_list = ", ".join([s["sport"] for s in olympic_sports[:2]]) if olympic_sports else "various Olympic events"
+        narrative = (
+            f"Paralympic Discovery Mode: Your build could align with the {archetype_name} archetype. "
+            f"{primary.get('description', '')} "
+            f"\n\n"
+            f"This profile is especially relevant to Paralympic events like {paralympic_list}, "
+            f"as well as Olympic events like {olympic_list}. "
+            f"\n\n"
+            f"{primary.get('historical_context', '')}"
+        )
+    else:
+        olympic_list = ", ".join([s["sport"] for s in olympic_sports[:2]]) if olympic_sports else "various Olympic events"
+        paralympic_list = ", ".join([s["sport"] for s in paralympic_sports[:2]]) if paralympic_sports else "various Paralympic events"
+        narrative = (
+            f"Based on your height and weight, your build could align with the {archetype_name} archetype. "
+            f"{primary.get('description', '')} "
+            f"\n\n"
+            f"This profile spans both Olympic events like {olympic_list} and Paralympic events like {paralympic_list}, "
+            f"where similar frames have been represented across Team USA's 120-year history. "
+            f"\n\n"
+            f"{primary.get('historical_context', '')}"
+        )
 
-    narrative = (
-        f"Based on your height and weight, your build could align with the {archetype_name} archetype. "
-        f"{primary.get('description', '')} "
-        f"\n\n"
-        f"This profile spans both Olympic events like {olympic_list} and Paralympic events like {paralympic_list}, "
-        f"where similar frames have been represented across Team USA's 120-year history. "
-        f"\n\n"
-        f"{primary.get('historical_context', '')}"
+    # Validate conditional language (Gemini auditing Gemini)
+    yield StreamEvent(
+        event_type=EventType.VALIDATION,
+        data={"message": "Validating conditional language compliance..."}
+    )
+    await asyncio.sleep(0.2)
+
+    validation_result = await validate_conditional_language(narrative, skip_if_compliant=False)
+    narrative = validation_result.validated_text
+
+    # Store validation trace in session
+    if session_id in _stream_sessions:
+        _stream_sessions[session_id]["validation_trace"] = {
+            "model": validation_result.model,
+            "input_length": validation_result.input_length,
+            "output_length": validation_result.output_length,
+            "was_modified": validation_result.was_modified,
+            "modifications": validation_result.modifications,
+            "latency_ms": validation_result.latency_ms,
+            "validation_summary": validation_result.validation_trace,
+        }
+
+        # Store secondary archetypes
+        ranked = match_result.get("ranked_archetypes", [])
+        secondary_archs = []
+        for arch in ranked[1:3]:  # 2nd and 3rd
+            secondary_archs.append({
+                "name": arch.get("name", ""),
+                "confidence": arch.get("match_strength", 0),
+                "description": arch.get("description", ""),
+                "is_paralympic_first": arch.get("is_paralympic_first", False),
+            })
+        _stream_sessions[session_id]["secondary_archetypes"] = secondary_archs
+
+    yield StreamEvent(
+        event_type=EventType.TOOL_RESULT,
+        data={
+            "tool": "validate_conditional_language",
+            "result_summary": f"Validated: {validation_result.was_modified and 'modified' or 'compliant'} ({validation_result.latency_ms:.0f}ms)",
+            "modifications": validation_result.modifications,
+        }
     )
 
     yield StreamEvent(
