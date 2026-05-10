@@ -21,6 +21,10 @@ const TOOL_LABELS: Record<string, { name: string; description: string }> = {
     name: "Follow-up Generator",
     description: "Preparing personalized questions for deeper exploration",
   },
+  search_grounding: {
+    name: "Current Momentum",
+    description: "Searching for recent Team USA news in matched sports",
+  },
 };
 
 export default function Processing() {
@@ -279,19 +283,30 @@ export default function Processing() {
             </span>
           </div>
 
-          <div className="max-h-32 space-y-2 overflow-y-auto font-mono text-sm">
+          <div className="max-h-40 space-y-2 overflow-y-auto font-mono text-sm">
             <AnimatePresence>
               {steps
-                .filter((s) => s.type === "thought")
+                .filter((s) => s.type === "thought" || s.type === "reasoning")
                 .map((step) => (
                   <motion.div
                     key={step.id}
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
-                    className="flex items-start gap-2"
+                    className={`flex items-start gap-2 ${
+                      step.type === "reasoning" ? "opacity-70" : ""
+                    }`}
                   >
-                    <span className="text-gold-core">→</span>
-                    <span className="text-silver">{step.content}</span>
+                    {step.type === "reasoning" ? (
+                      <>
+                        <span className="text-smoke/60">💭</span>
+                        <span className="italic text-smoke/80">{step.content}</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className="text-gold-core">→</span>
+                        <span className="text-silver">{step.content}</span>
+                      </>
+                    )}
                   </motion.div>
                 ))}
             </AnimatePresence>

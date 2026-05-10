@@ -83,6 +83,7 @@ export async function getSessionResult(
 
 export type StreamEventType =
   | "thinking"
+  | "reasoning"  // Gemini 2.5 Pro thinking traces
   | "tool_call"
   | "tool_result"
   | "validation"
