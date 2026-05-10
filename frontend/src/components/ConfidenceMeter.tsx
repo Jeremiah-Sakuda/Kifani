@@ -61,7 +61,7 @@ export default function ConfidenceMeter({ confidence, showExplanation = true }: 
   const levelInfo = getConfidenceLevel(confidence);
 
   return (
-    <div className="w-full">
+    <div className="w-full min-w-0 text-left" style={{ display: 'block' }}>
       {/* Header Row */}
       <div className="mb-3 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
