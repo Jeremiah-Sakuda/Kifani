@@ -6,9 +6,19 @@ interface ShareCardProps {
   archetype: string;
   confidence: number;
   sessionId: string;
+  portraitUrl?: string;  // Imagen-generated portrait
+  sports?: string[];     // "Could align with" sports
+  isParalympicFirst?: boolean;
 }
 
-export default function ShareCard({ archetype, confidence, sessionId }: ShareCardProps) {
+export default function ShareCard({
+  archetype,
+  confidence,
+  sessionId,
+  portraitUrl,
+  sports = [],
+  isParalympicFirst = false,
+}: ShareCardProps) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -59,7 +69,7 @@ export default function ShareCard({ archetype, confidence, sessionId }: ShareCar
       {/* The shareable card */}
       <div
         ref={cardRef}
-        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-forge-obsidian via-forge-charcoal to-forge-obsidian p-8"
+        className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-forge-obsidian via-forge-charcoal to-forge-obsidian p-6"
         style={{ width: "400px" }}
       >
         {/* Background decorations */}
@@ -69,33 +79,78 @@ export default function ShareCard({ archetype, confidence, sessionId }: ShareCar
         {/* Content */}
         <div className="relative z-10">
           {/* Header */}
-          <div className="mb-6 flex items-center justify-between">
-            <span className="font-display text-sm tracking-widest text-gold-core">
+          <div className="mb-4 flex items-center justify-between">
+            <span className="font-display text-lg tracking-[0.3em] text-gradient-gold">
               FORGED
             </span>
-            <span className="rounded-full bg-forge-steel/50 px-3 py-1 text-xs text-smoke">
-              Team USA Archetype
-            </span>
+            {isParalympicFirst && (
+              <span className="rounded-full bg-para-green/20 px-2 py-0.5 text-xs text-para-green">
+                Paralympic-First
+              </span>
+            )}
           </div>
 
-          {/* Main content */}
-          <div className="mb-6 text-center">
-            <p className="mb-2 text-sm text-smoke">I am a</p>
-            <h2 className="mb-3 font-display text-4xl text-gradient-gold">
-              {archetype}
-            </h2>
-            <p className="text-sm text-silver">
-              {getConfidenceLabel(confidence)} ({Math.round(confidence * 100)}%)
-            </p>
+          {/* Portrait + Archetype */}
+          <div className="mb-4 flex gap-4">
+            {/* Portrait or placeholder */}
+            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-forge-steel/50">
+              {portraitUrl ? (
+                <img
+                  src={portraitUrl}
+                  alt={`${archetype} archetype portrait`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center">
+                  <span className="text-3xl">🏛️</span>
+                </div>
+              )}
+            </div>
+
+            {/* Archetype info */}
+            <div className="flex flex-col justify-center">
+              <p className="mb-1 text-xs text-smoke">My archetype is</p>
+              <h2 className="mb-1 font-display text-2xl text-gradient-gold">
+                {archetype}
+              </h2>
+              <p className="text-sm text-silver">
+                {getConfidenceLabel(confidence)} • {Math.round(confidence * 100)}%
+              </p>
+            </div>
           </div>
+
+          {/* Sports alignment */}
+          {sports.length > 0 && (
+            <div className="mb-4">
+              <p className="mb-2 text-xs text-ash">Could align with:</p>
+              <div className="flex flex-wrap gap-1.5">
+                {sports.slice(0, 4).map((sport, i) => (
+                  <span
+                    key={i}
+                    className="rounded-full bg-forge-steel/60 px-2.5 py-1 text-xs text-silver"
+                  >
+                    {sport}
+                  </span>
+                ))}
+                {sports.length > 4 && (
+                  <span className="rounded-full bg-forge-steel/40 px-2.5 py-1 text-xs text-ash">
+                    +{sports.length - 4} more
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Divider */}
-          <div className="mb-6 h-px bg-gradient-to-r from-transparent via-gold-core/30 to-transparent" />
+          <div className="mb-3 h-px bg-gradient-to-r from-transparent via-gold-core/30 to-transparent" />
 
           {/* Footer */}
-          <p className="text-center text-xs text-ash">
-            Discover your place in 120 years of Team USA excellence
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-xs text-ash">
+              120 years of Team USA excellence
+            </p>
+            <span className="font-mono text-xs text-gold-core/60">LA28</span>
+          </div>
         </div>
       </div>
 

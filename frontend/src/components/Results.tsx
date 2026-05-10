@@ -696,6 +696,14 @@ export default function Results() {
               archetype={result.primary_archetype.name}
               confidence={confidence}
               sessionId={sessionId || ""}
+              sports={[
+                ...(result.olympic_sports || []).map(s => s.sport),
+                ...(result.paralympic_sports || []).map(s => s.sport),
+              ].slice(0, 6)}
+              isParalympicFirst={
+                result.olympic_sports?.length === 0 &&
+                (result.paralympic_sports?.length || 0) > 0
+              }
             />
           </div>
         </motion.section>
