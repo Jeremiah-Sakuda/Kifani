@@ -52,6 +52,24 @@ def _compute_weighted_distance(
     Uses sample_weight to give Paralympic-first archetypes proportional
     influence despite smaller athlete counts.
     """
+    return _compute_weighted_distance_with_weight(
+        user_height, user_weight, user_bmi, centroid, centroid.sample_weight
+    )
+
+
+def _compute_weighted_distance_with_weight(
+    user_height: float,
+    user_weight: float,
+    user_bmi: float,
+    centroid: ArchetypeCentroid,
+    sample_weight: float,
+) -> float:
+    """
+    Compute weighted Euclidean distance with custom sample weight.
+
+    This allows Paralympic Discovery Mode to boost certain archetypes
+    without modifying the underlying archetype data.
+    """
     # Normalize user values
     h_user = _normalize(user_height, NORM_HEIGHT_MIN, NORM_HEIGHT_MAX)
     w_user = _normalize(user_weight, NORM_WEIGHT_MIN, NORM_WEIGHT_MAX)
@@ -72,14 +90,21 @@ def _compute_weighted_distance(
 
     # Apply inverse sample weight — higher weight = appears "closer"
     # This gives Paralympic archetypes more pull for matching users
-    weighted_distance = raw_distance / centroid.sample_weight
+    weighted_distance = raw_distance / sample_weight
 
     return weighted_distance
 
 
-def compute_archetype_match(req: MatchRequest) -> ArchetypeMatchResult:
+def compute_archetype_match(
+    req: MatchRequest,
+    paralympic_discovery: bool = False,
+) -> ArchetypeMatchResult:
     """
     Find the closest archetype(s) to the user's biometrics.
+
+    Args:
+        req: User's biometric data
+        paralympic_discovery: If True, boost Paralympic-first archetypes to lead matches
 
     Returns match data including:
     - Primary archetype with confidence score
@@ -90,14 +115,25 @@ def compute_archetype_match(req: MatchRequest) -> ArchetypeMatchResult:
     # Calculate user's BMI
     user_bmi = req.weight_kg / ((req.height_cm / 100) ** 2)
 
+    # Paralympic Discovery Mode: temporarily boost Paralympic archetypes
+    # by increasing their sample_weight for this computation
+    PARALYMPIC_DISCOVERY_BOOST = 1.5
+
     # Compute weighted distances to all archetypes
     distances: list[tuple[ArchetypeCentroid, float]] = []
     for archetype in ARCHETYPES:
-        dist = _compute_weighted_distance(
+        # Apply Paralympic discovery boost if enabled
+        effective_weight = archetype.sample_weight
+        if paralympic_discovery and archetype.name in ["Adaptive Power", "Adaptive Endurance"]:
+            effective_weight *= PARALYMPIC_DISCOVERY_BOOST
+
+        # Create temporary centroid with boosted weight
+        dist = _compute_weighted_distance_with_weight(
             req.height_cm,
             req.weight_kg,
             user_bmi,
-            archetype
+            archetype,
+            effective_weight,
         )
         distances.append((archetype, dist))
 
