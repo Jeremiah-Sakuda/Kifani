@@ -116,7 +116,7 @@ steps:
       - '--max-instances'
       - '10'
       - '--set-env-vars'
-      - 'GCP_PROJECT_ID=$PROJECT_ID,GCP_LOCATION=${_REGION},DEV_MODE=false'
+      - 'GCP_PROJECT_ID=$PROJECT_ID,GCP_LOCATION=${_REGION},DEV_MODE=false,ALLOWED_ORIGINS=https://forged-frontend-481161735332.us-central1.run.app'
 
   # ════════════════════════════════════════════════════════════════════════════
   # Step 7: Get Backend URL
