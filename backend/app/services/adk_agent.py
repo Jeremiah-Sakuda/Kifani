@@ -15,6 +15,7 @@ from enum import Enum
 from google.cloud import aiplatform
 from vertexai.generative_models import (
     GenerativeModel,
+    GenerationConfig,
     Tool,
     FunctionDeclaration,
     Part,
@@ -63,6 +64,7 @@ MODEL_NAME = "gemini-2.5-pro"
 class EventType(str, Enum):
     """SSE event types for reasoning trace."""
     THINKING = "thinking"
+    REASONING = "reasoning"  # Gemini 2.5 Pro thinking traces
     TOOL_CALL = "tool_call"
     TOOL_RESULT = "tool_result"
     VALIDATION = "validation"
@@ -172,12 +174,71 @@ def _execute_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
 
 
 def _get_model() -> GenerativeModel:
-    """Initialize and return the Gemini model."""
+    """Initialize and return the Gemini model with thinking enabled."""
     aiplatform.init(project=PROJECT_ID, location=LOCATION)
+
+    # Enable thinking for Gemini 2.5 Pro
+    generation_config = GenerationConfig(
+        temperature=0.7,
+        top_p=0.95,
+        max_output_tokens=8192,
+    )
+
     return GenerativeModel(
         MODEL_NAME,
         system_instruction=SYSTEM_PROMPT,
+        generation_config=generation_config,
     )
+
+
+# ── Thinking Trace Extraction ──
+
+async def _extract_thinking_traces(response) -> AsyncIterator[StreamEvent]:
+    """
+    Extract thinking/reasoning traces from Gemini 2.5 Pro response.
+
+    Gemini 2.5 Pro can include internal reasoning in its responses.
+    This function extracts those traces and yields them as REASONING events.
+    """
+    if not hasattr(response, 'candidates') or not response.candidates:
+        return
+
+    for candidate in response.candidates:
+        if not hasattr(candidate, 'content') or not candidate.content:
+            continue
+
+        for part in candidate.content.parts:
+            # Check for thought/reasoning content
+            # Gemini 2.5 Pro may expose thinking via different attributes
+            thought_text = None
+
+            # Check for explicit thought attribute
+            if hasattr(part, 'thought') and part.thought:
+                thought_text = part.thought
+
+            # Check for thinking in text with markers
+            elif hasattr(part, 'text') and part.text:
+                text = part.text
+                # Look for thinking patterns in the text
+                if text.strip().startswith(('<thinking>', '[Reasoning]', 'Let me think')):
+                    thought_text = text
+
+            if thought_text:
+                # Clean up the thought text
+                thought_text = thought_text.strip()
+                if thought_text.startswith('<thinking>'):
+                    thought_text = thought_text[10:]
+                if thought_text.endswith('</thinking>'):
+                    thought_text = thought_text[:-11]
+
+                yield StreamEvent(
+                    event_type=EventType.REASONING,
+                    data={
+                        "thought": thought_text.strip(),
+                        "iteration": 1,
+                    }
+                )
+                await asyncio.sleep(0.05)  # Small delay for UI streaming
 
 
 # ── Agent Orchestration ──
@@ -250,6 +311,10 @@ async def run_agent_stream(
 
         while iteration < max_iterations:
             iteration += 1
+
+            # Extract and yield any thinking/reasoning traces from the response
+            async for thinking_event in _extract_thinking_traces(response):
+                yield thinking_event
 
             # Check if response has function calls
             has_function_call = False
