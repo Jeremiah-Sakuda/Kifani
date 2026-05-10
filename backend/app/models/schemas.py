@@ -22,6 +22,26 @@ class ArchetypeInfo(BaseModel):
     description: str
     historical_context: str
     confidence: float
+    insight: str | None = None  # Non-obvious analytical insight
+
+
+class SecondaryArchetype(BaseModel):
+    """Secondary archetype match for discovery."""
+    name: str
+    confidence: float
+    description: str
+    is_paralympic_first: bool = False
+
+
+class ValidationTrace(BaseModel):
+    """Exposed validation trace for transparency — Gemini auditing Gemini."""
+    model: str = "gemini-2.0-flash-001"
+    input_length: int
+    output_length: int
+    was_modified: bool
+    modifications: list[str] = []
+    latency_ms: float
+    validation_summary: str = ""
 
 
 class DigitalMirrorData(BaseModel):
@@ -33,10 +53,13 @@ class DigitalMirrorData(BaseModel):
 class MatchResponse(BaseModel):
     session_id: str
     primary_archetype: ArchetypeInfo
+    secondary_archetypes: list[SecondaryArchetype] = []  # For discovery panel
     olympic_sports: list[SportMatch]
     paralympic_sports: list[SportMatch]
     digital_mirror: DigitalMirrorData
     narrative: str
+    validation_trace: ValidationTrace | None = None  # Gemini auditing Gemini
+    paralympic_discovery_mode: bool = False  # Track if Para mode was used
 
 
 class ChatRequest(BaseModel):
@@ -60,6 +83,7 @@ class StreamMatchRequest(BaseModel):
     weight_kg: float = Field(..., gt=0, description="Weight in kilograms")
     arm_span_cm: float | None = Field(None, gt=0, description="Arm span in centimeters")
     activity_preferences: list[str] | None = Field(None, description="Activity preferences")
+    paralympic_discovery: bool = Field(False, description="Enable Paralympic Discovery Mode")
 
 
 class StreamChatRequest(BaseModel):
@@ -80,8 +104,11 @@ class StreamSessionResponse(BaseModel):
     """Response from stream session endpoint."""
     session_id: str
     primary_archetype: dict
+    secondary_archetypes: list[SecondaryArchetype] = []  # For discovery panel
     ranked_archetypes: list[RankedArchetype] = []
     sport_alignments: dict = {}
     user_metrics: dict = {}
     centroid_positions: dict = {}
     narrative: str = ""
+    validation_trace: ValidationTrace | None = None  # Gemini auditing Gemini
+    paralympic_discovery_mode: bool = False
