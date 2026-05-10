@@ -39,8 +39,11 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 - **Digital Mirror** — D3.js scatter plot + Imagen-generated stylized portrait
 - **Paralympic Parity** — Olympic and Paralympic athletes weighted equally; classification depth matches Olympic analysis
 - **Conversational Follow-ups** — Multi-turn Gemini agent for deeper exploration
-- **Real-time Processing** — Server-Sent Events stream the Gemini reasoning trace live
+- **Real-time Processing** — Server-Sent Events stream the Gemini thinking traces live
 - **Confidence Scoring** — Each match includes a confidence percentage with explanations
+- **Search Grounding** — Google Search integration finds current Team USA athletes in your recommended sports
+- **Dual-Signal Matching** — K-means clustering + text-embedding-005 semantic similarity for robust results
+- **Shareable Results** — LA28-branded share cards with portrait and sport recommendations
 
 ### Additional Features
 
@@ -107,10 +110,13 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 
 | Service | Usage |
 |---------|-------|
-| **Vertex AI — Gemini 2.5 Pro** | Agent orchestration with 4-tool function calling |
+| **Vertex AI — Gemini 2.5 Pro** | Agent orchestration with 5-tool function calling + thinking traces |
 | **Vertex AI — Gemini 2.0 Flash** | Photo analysis, voice transcription, conditional language validation |
 | **Vertex AI — Imagen 3.0** | Non-photorealistic archetype portrait generation |
-| **BigQuery** | 14,218 Olympic athlete records + 30+ Paralympic classification taxonomy |
+| **Vertex AI — text-embedding-005** | Semantic similarity matching for dual-signal results |
+| **Vertex AI — Context Caching** | Cached archetype corpus for efficient reuse across sessions |
+| **Vertex AI — Google Search** | Search grounding for current Team USA athlete relevance |
+| **BigQuery** | 14,218 Olympic + 2,847 Paralympic athlete records |
 | **Firestore** | Session persistence for multi-turn conversations |
 | **Cloud Run** | Serverless deployment (auto-scaling 0-10 instances) |
 | **Cloud Build** | CI/CD pipeline (8-step build and deploy) |
@@ -124,7 +130,10 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 Not a checkbox feature — Two archetypes (Adaptive Power, Adaptive Endurance) are Paralympic-first, with expert-defined centroids matching Paralympic sport requirements. 30+ classification codes documented with full explanations, providing equal analytical depth to Paralympic sports.
 
 ### 2. Real Agentic Orchestration
-Gemini 2.5 Pro with function calling orchestrates 4 specialized tools. Server-Sent Events stream the reasoning trace in real-time. Not simulated loading spinners — actual tool execution visible to users.
+Gemini 2.5 Pro with function calling orchestrates 5 specialized tools. Thinking traces stream via SSE in real-time. Not simulated loading spinners — actual tool execution and reasoning visible to users.
+
+### 2.5 Dual-Signal Matching
+K-means clustering provides biometric matching, while text-embedding-005 enables semantic matching from natural language descriptions. When both signals agree, confidence increases. Google Search grounding connects results to current Team USA athletes.
 
 ### 3. Multimodal Input
 - **Photo:** Gemini Vision extracts body proportions from full-body images
@@ -176,15 +185,19 @@ Each archetype has a unique Imagen-generated stylized portrait. Non-photorealist
 │   │   │   ├── adk_agent.py           # Gemini 2.5 Pro orchestration
 │   │   │   ├── clustering.py          # K-means matching algorithm
 │   │   │   ├── conditional_language.py # Compliance phrasing layer
+│   │   │   ├── context_cache.py       # Vertex AI context caching
+│   │   │   ├── semantic_match.py      # text-embedding-005 matching
 │   │   │   ├── imagen_service.py      # Portrait generation
 │   │   │   ├── photo_analysis.py      # Gemini Vision processing
 │   │   │   ├── voice_analysis.py      # Audio transcription
 │   │   │   ├── firestore_service.py   # Session persistence
 │   │   │   └── gemini_agent.py        # Chat agent
 │   │   └── tools/                     # ADK tool implementations
-│   │       ├── match_archetype.py
-│   │       ├── classify_paralympic.py
-│   │       └── era_evolution.py
+│   │       ├── match_archetype.py     # K-means + semantic dual match
+│   │       ├── get_archetype_sports.py # Sport recommendations
+│   │       ├── classify_paralympic.py # Paralympic classification
+│   │       ├── generate_portrait.py   # Imagen portrait
+│   │       └── search_grounding.py    # Google Search grounding
 │   ├── tests/                         # Pytest test suite
 │   ├── Dockerfile
 │   └── requirements.txt
@@ -200,7 +213,10 @@ Each archetype has a unique Imagen-generated stylized portrait. Non-photorealist
 │   │   │   ├── ChatInterface.tsx      # Follow-up conversation
 │   │   │   ├── ParalympicExplorer.tsx # Classification browser
 │   │   │   ├── EraTimeline.tsx        # Historical evolution
+│   │   │   ├── ShareCard.tsx          # LA28-branded share cards
 │   │   │   └── ...
+│   │   ├── pages/
+│   │   │   └── HowItWorks.tsx         # Agent architecture documentation
 │   │   ├── hooks/
 │   │   │   ├── useStreamMatch.ts      # SSE event handling
 │   │   │   └── useChat.ts             # Chat state management
@@ -311,7 +327,7 @@ cd frontend && npm run typecheck
 | Criteria | Weight | How We Address It |
 |----------|--------|-------------------|
 | **Impact** | 40% | Fan-centric archetype discovery with inspiring Paralympic representation; solves "where do I fit in Team USA history?" |
-| **Technical Depth** | 30% | 4-tool Gemini agent, multimodal input (photo/voice/form), Imagen integration, BigQuery data layer, real-time SSE streaming |
+| **Technical Depth** | 30% | 5-tool Gemini agent with thinking traces, context caching, semantic embeddings, search grounding, multimodal input, Imagen integration, real-time SSE streaming |
 | **Presentation** | 30% | Theatrical Digital Mirror reveal, visible reasoning trace, polished UI with Framer Motion animations |
 
 ---
