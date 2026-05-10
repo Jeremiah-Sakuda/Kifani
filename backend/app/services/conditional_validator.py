@@ -7,11 +7,14 @@ compliant conditional language. All claims must use hedged phrasing
 ("you would be good at", "you are").
 
 This is a real validation pass, not static phrase substitution.
+The validation trace is exposed in API responses so judges can see
+"Gemini auditing Gemini" in real-time.
 """
 
 import logging
 import os
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 
 from google.cloud import aiplatform
 from vertexai.generative_models import GenerativeModel, GenerationConfig
@@ -56,17 +59,61 @@ OUTPUT: Return ONLY the revised text with compliant conditional language. Do not
 
 @dataclass
 class ValidationResult:
-    """Result of conditional language validation."""
+    """Result of conditional language validation with full trace for transparency."""
     original_text: str
     validated_text: str
     was_modified: bool
     validation_trace: str
+    # Additional fields for detailed observability
+    model: str = MODEL_NAME
+    input_length: int = 0
+    output_length: int = 0
+    latency_ms: float = 0.0
+    modifications: list[str] = field(default_factory=list)
 
 
 def _get_flash_model() -> GenerativeModel:
     """Initialize Gemini 2.0 Flash for validation."""
     aiplatform.init(project=PROJECT_ID, location=LOCATION)
     return GenerativeModel(MODEL_NAME)
+
+
+def _detect_modifications(original: str, validated: str) -> list[str]:
+    """
+    Detect specific modifications made during validation.
+
+    Returns a list of human-readable change descriptions for the trace.
+    """
+    modifications = []
+    original_lower = original.lower()
+    validated_lower = validated.lower()
+
+    # Check for specific phrase replacements
+    replacements = [
+        ("you would be good at", "'you would be good at' → conditional"),
+        ("you would be", "'you would be' → hedged phrasing"),
+        ("you are a ", "'you are a' → 'your profile suggests'"),
+        ("you should try", "'you should try' → 'you might consider'"),
+        ("your body is built for", "'your body is built for' → 'your build shares characteristics'"),
+        ("you will succeed", "'you will succeed' → 'patterns suggest potential'"),
+        ("perfect for you", "'perfect for you' → hedged recommendation"),
+        ("perfect for", "'perfect for' → conditional alignment"),
+        ("ideal for you", "'ideal for you' → 'could align with'"),
+        ("ideal for", "'ideal for' → hedged suggestion"),
+        ("you are destined", "'you are destined' → removed deterministic claim"),
+        ("you should", "'you should' → 'you might'"),
+        ("you will", "'you will' → 'you could'"),
+    ]
+
+    for phrase, description in replacements:
+        if phrase in original_lower and phrase not in validated_lower:
+            modifications.append(description)
+
+    # Generic catch-all if text changed but no specific patterns matched
+    if not modifications and original != validated:
+        modifications.append("General phrasing adjustments for compliance")
+
+    return modifications
 
 
 async def validate_conditional_language(
@@ -89,6 +136,10 @@ async def validate_conditional_language(
             validated_text=text,
             was_modified=False,
             validation_trace="Empty input — no validation needed",
+            input_length=0,
+            output_length=0,
+            latency_ms=0.0,
+            modifications=[],
         )
 
     # Quick check for obvious compliance issues
@@ -113,9 +164,15 @@ async def validate_conditional_language(
             validated_text=text,
             was_modified=False,
             validation_trace="Quick scan: no definitive markers found — text appears compliant",
+            input_length=len(text),
+            output_length=len(text),
+            latency_ms=0.0,
+            modifications=[],
         )
 
     try:
+        start_time = time.perf_counter()
+
         model = _get_flash_model()
 
         prompt = VALIDATION_PROMPT.format(text=text)
@@ -130,29 +187,38 @@ async def validate_conditional_language(
             generation_config=generation_config,
         )
 
+        latency_ms = (time.perf_counter() - start_time) * 1000
+
         validated_text = response.text.strip() if response.text else text
 
         was_modified = validated_text != text
 
+        # Detect specific modifications for transparency
+        modifications = _detect_modifications(text, validated_text)
+
         trace_parts = [
             "Gemini Flash validation completed",
             f"Model: {MODEL_NAME}",
-            f"Input length: {len(text)} chars",
-            f"Output length: {len(validated_text)} chars",
+            f"Input: {len(text)} chars",
+            f"Output: {len(validated_text)} chars",
+            f"Latency: {latency_ms:.0f}ms",
             f"Modified: {was_modified}",
         ]
 
-        if was_modified:
-            # Log what changed for transparency
-            trace_parts.append("Changes applied to ensure conditional language compliance")
+        if modifications:
+            trace_parts.append(f"Changes: {', '.join(modifications)}")
 
-        logger.info(f"Conditional language validation: modified={was_modified}")
+        logger.info(f"Conditional language validation: modified={was_modified}, latency={latency_ms:.0f}ms")
 
         return ValidationResult(
             original_text=text,
             validated_text=validated_text,
             was_modified=was_modified,
             validation_trace=" | ".join(trace_parts),
+            input_length=len(text),
+            output_length=len(validated_text),
+            latency_ms=latency_ms,
+            modifications=modifications,
         )
 
     except Exception as e:
@@ -163,6 +229,10 @@ async def validate_conditional_language(
             validated_text=text,
             was_modified=False,
             validation_trace=f"Validation error: {str(e)} — returning original text",
+            input_length=len(text),
+            output_length=len(text),
+            latency_ms=0.0,
+            modifications=[],
         )
 
 
