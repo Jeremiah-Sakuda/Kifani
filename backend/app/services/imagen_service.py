@@ -173,9 +173,13 @@ async def generate_portrait(
         )
 
     except Exception as e:
+        import traceback
+        error_details = f"{type(e).__name__}: {str(e)}"
+        print(f"[IMAGEN ERROR] {error_details}")
+        print(f"[IMAGEN TRACEBACK] {traceback.format_exc()}")
         return ImagenResult(
             success=False,
-            error=str(e),
+            error=error_details,
         )
 
 

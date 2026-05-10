@@ -34,12 +34,11 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
 
     async function loadPortrait() {
       try {
-        // Set a timeout - if generation takes too long, show placeholder
+        // Set a timeout - if generation takes too long, show error
         timeoutId = setTimeout(() => {
           if (!cancelled && state === "loading") {
-            console.warn("Portrait generation timed out, showing abstract visualization");
-            setIsPlaceholder(true);
-            setState("ready");
+            setError("Portrait generation timed out (15s)");
+            setState("error");
           }
         }, 15000); // 15 second timeout
 
@@ -53,18 +52,19 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
           setIsPlaceholder(result.is_placeholder || false);
           setState("ready");
         } else {
-          // On error, show abstract visualization instead of blocking
-          console.warn("Portrait generation failed:", result.error);
-          setIsPlaceholder(true);
-          setState("ready"); // Still show "ready" state with abstract visualization
+          // Show actual error message from backend
+          const errorMsg = result.error || "Failed to generate portrait";
+          console.error("Portrait generation failed:", errorMsg);
+          setError(errorMsg);
+          setState("error");
         }
       } catch (err) {
         clearTimeout(timeoutId);
         if (cancelled) return;
-        // On error, show abstract visualization
-        console.warn("Portrait generation error:", err);
-        setIsPlaceholder(true);
-        setState("ready"); // Show abstract visualization instead of error
+        const errorMsg = err instanceof Error ? err.message : "Network error";
+        console.error("Portrait generation error:", err);
+        setError(errorMsg);
+        setState("error");
       }
     }
 
@@ -177,26 +177,42 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
 
                   {state === "error" && (
                     <>
-                      <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
-                        <svg className="h-10 w-10 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm">
+                        <svg className="h-8 w-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
                         </svg>
                       </div>
                       <p className="mb-2 font-display text-lg text-white/90">
-                        Generation unavailable
+                        Portrait Generation Failed
                       </p>
-                      <p className="mb-6 text-sm text-white/60">
-                        {error}
-                      </p>
-                      <motion.button
-                        onClick={handleRetry}
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="rounded-full bg-white/20 px-6 py-2 text-sm font-medium text-white transition hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
-                        aria-label="Retry portrait generation"
-                      >
-                        Try Again
-                      </motion.button>
+                      <div className="mx-auto mb-4 max-h-24 max-w-xs overflow-auto rounded bg-black/30 p-2">
+                        <p className="font-mono text-xs text-red-300 break-all">
+                          {error}
+                        </p>
+                      </div>
+                      <div className="flex gap-3">
+                        <motion.button
+                          onClick={handleRetry}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="rounded-full bg-white/20 px-5 py-2 text-sm font-medium text-white transition hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                          aria-label="Retry portrait generation"
+                        >
+                          Retry
+                        </motion.button>
+                        <motion.button
+                          onClick={() => {
+                            setIsPlaceholder(true);
+                            setState("ready");
+                          }}
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="rounded-full bg-white px-5 py-2 text-sm font-medium text-forge-black transition hover:bg-gold-bright focus:outline-none focus:ring-2 focus:ring-gold-core"
+                          aria-label="Skip portrait and continue"
+                        >
+                          Skip
+                        </motion.button>
+                      </div>
                     </>
                   )}
                 </div>
