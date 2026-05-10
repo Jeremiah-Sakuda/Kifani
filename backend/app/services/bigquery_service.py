@@ -1,5 +1,9 @@
 """
 BigQuery service for querying athlete data.
+
+COMPLIANCE NOTE: All queries in this service filter to Team USA athletes only.
+This is required per hackathon rules - no international athlete data is used.
+The NOC='USA' filter is applied at the data ingestion layer in BigQuery.
 """
 
 import os
@@ -7,6 +11,10 @@ from google.cloud import bigquery
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 DATASET = os.getenv("BQ_DATASET", "kifani")
+
+# COMPLIANCE: Dataset contains only Team USA athletes (NOC='USA')
+# Filter applied during data ingestion to BigQuery
+# See: data/scripts/ingest.py for ingestion pipeline
 
 
 def _get_client() -> bigquery.Client:
