@@ -32,12 +32,28 @@ interface SecondaryArchetype {
   is_paralympic_first: boolean;
 }
 
+interface DualMatch {
+  biometric_match: {
+    archetype: string;
+    confidence: number;
+    method: string;
+  };
+  semantic_match: {
+    archetype: string;
+    confidence: number;
+    method: string;
+  } | null;
+  combined_confidence: number;
+  signals_agree: boolean;
+}
+
 // Extended result with new fields
 interface ExtendedSessionResult extends SessionResult {
   validation_trace?: ValidationTrace;
   secondary_archetypes?: SecondaryArchetype[];
   paralympic_discovery_mode?: boolean;
   insight?: string;
+  dual_match?: DualMatch;
 }
 
 // Normalize streaming result to match expected format
@@ -65,6 +81,7 @@ function normalizeResult(
     secondary_archetypes: (streamResult as unknown as { secondary_archetypes?: SecondaryArchetype[] }).secondary_archetypes,
     paralympic_discovery_mode: (streamResult as unknown as { paralympic_discovery_mode?: boolean }).paralympic_discovery_mode,
     insight: streamResult.primary_archetype.insight,
+    dual_match: (streamResult as unknown as { dual_match?: DualMatch }).dual_match,
   };
 }
 
@@ -208,6 +225,66 @@ export default function Results() {
           <motion.div variants={fadeUp} className="mx-auto mb-8 w-full max-w-2xl px-4">
             <ConfidenceMeter confidence={confidence} showExplanation />
           </motion.div>
+
+          {/* Dual Match Display (when semantic matching is available) */}
+          {result.dual_match?.semantic_match && (
+            <motion.div
+              variants={fadeUp}
+              className="mx-auto mb-8 w-full max-w-2xl px-4"
+            >
+              <div className="rounded-xl bg-forge-charcoal/60 p-4">
+                <div className="mb-3 flex items-center justify-between">
+                  <span className="font-mono text-xs uppercase tracking-wider text-ash">
+                    Dual Match Analysis
+                  </span>
+                  {result.dual_match.signals_agree ? (
+                    <span className="flex items-center gap-1.5 rounded-full bg-para-green/20 px-2 py-0.5 text-xs text-para-green">
+                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                      Signals Agree
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-ember-glow/20 px-2 py-0.5 text-xs text-ember-bright">
+                      Mixed Signals
+                    </span>
+                  )}
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {/* Biometric Match */}
+                  <div className="rounded-lg bg-forge-steel/50 p-3">
+                    <div className="mb-1.5 flex items-center gap-2">
+                      <span className="text-sm font-medium text-white">Biometric Match</span>
+                    </div>
+                    <div className="mb-1 text-xs text-smoke">K-means clustering</div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-display text-gold-core">
+                        {(result.dual_match.biometric_match.confidence * 100).toFixed(0)}%
+                      </span>
+                      <span className="text-sm text-silver">
+                        {result.dual_match.biometric_match.archetype}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Semantic Match */}
+                  <div className="rounded-lg bg-forge-steel/50 p-3">
+                    <div className="mb-1.5 flex items-center gap-2">
+                      <span className="text-sm font-medium text-white">Narrative Match</span>
+                    </div>
+                    <div className="mb-1 text-xs text-smoke">text-embedding-005</div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-2xl font-display text-gold-core">
+                        {(result.dual_match.semantic_match.confidence * 100).toFixed(0)}%
+                      </span>
+                      <span className="text-sm text-silver">
+                        {result.dual_match.semantic_match.archetype}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
 
           {/* Paralympic Discovery Mode Toggle */}
           <motion.div variants={fadeUp} className="mb-8 flex items-center justify-center gap-3">

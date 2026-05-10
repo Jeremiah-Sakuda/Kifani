@@ -115,6 +115,22 @@ export interface SecondaryArchetype {
   is_paralympic_first: boolean;
 }
 
+// Dual match result (biometric + semantic)
+export interface DualMatch {
+  biometric_match: {
+    archetype: string;
+    confidence: number;
+    method: string;
+  };
+  semantic_match: {
+    archetype: string;
+    confidence: number;
+    method: string;
+  } | null;
+  combined_confidence: number;
+  signals_agree: boolean;
+}
+
 export interface StreamSessionResult {
   session_id: string;
   primary_archetype: {
@@ -147,6 +163,7 @@ export interface StreamSessionResult {
   narrative: string;
   validation_trace?: ValidationTrace; // Gemini auditing Gemini
   paralympic_discovery_mode?: boolean;
+  dual_match?: DualMatch; // Biometric + semantic matching
 }
 
 /**
