@@ -318,8 +318,19 @@ export default function DigitalMirror({ data }: Props) {
 
   }, [data]);
 
+  // Find closest archetype for screen reader description
+  const closestArchetype = Object.entries(data.centroid_positions)
+    .map(([name, pos]) => ({ name, distance: getDistance(data.user_position, pos) }))
+    .sort((a, b) => a.distance - b.distance)[0]?.name || "Unknown";
+
   return (
-    <div className="overflow-hidden rounded-2xl bg-forge-charcoal/60 backdrop-blur-sm">
+    <div className="overflow-hidden rounded-2xl bg-forge-charcoal/60 backdrop-blur-sm" role="figure" aria-label="Digital Mirror visualization showing your position relative to 8 Team USA archetypes">
+      {/* Screen reader description */}
+      <div className="sr-only">
+        Your position in the Digital Mirror is closest to the {closestArchetype} archetype.
+        The visualization shows 8 archetype centroids derived from 120 years of Team USA athlete data.
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between border-b border-forge-graphite/30 px-6 py-4">
         <div>
@@ -336,7 +347,7 @@ export default function DigitalMirror({ data }: Props) {
 
       {/* Chart */}
       <div className="p-4">
-        <svg ref={svgRef} className="h-[500px] w-full" />
+        <svg ref={svgRef} className="h-[500px] w-full" aria-hidden="true" />
       </div>
 
       {/* Legend */}

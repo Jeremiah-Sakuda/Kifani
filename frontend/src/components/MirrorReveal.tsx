@@ -73,7 +73,7 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
   };
 
   return (
-    <div className="relative">
+    <div className="relative" role="region" aria-label="Imagen Portrait Mirror">
       {/* Section Header */}
       <div className="mb-6 flex items-center gap-3">
         <div className="h-px flex-1 bg-forge-graphite" />
@@ -147,9 +147,11 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
                       </p>
                       <motion.button
                         onClick={handleReveal}
+                        onKeyDown={(e) => e.key === 'Enter' && handleReveal()}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="rounded-full bg-white px-8 py-3 font-body font-semibold text-forge-black transition hover:bg-gold-bright"
+                        className="rounded-full bg-white px-8 py-3 font-body font-semibold text-forge-black transition hover:bg-gold-bright focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-charcoal"
+                        aria-label={`Reveal ${archetype} portrait`}
                       >
                         Reveal Portrait
                       </motion.button>
@@ -173,7 +175,8 @@ export default function MirrorReveal({ archetype, sessionId, onReveal }: Props) 
                         onClick={handleRetry}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="rounded-full bg-white/20 px-6 py-2 text-sm font-medium text-white transition hover:bg-white/30"
+                        className="rounded-full bg-white/20 px-6 py-2 text-sm font-medium text-white transition hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        aria-label="Retry portrait generation"
                       >
                         Try Again
                       </motion.button>

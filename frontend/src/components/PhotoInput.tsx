@@ -150,7 +150,7 @@ export default function PhotoInput({ onFallback }: Props) {
   };
 
   return (
-    <div className="card-forge rounded-2xl p-8">
+    <div className="card-forge rounded-2xl p-8" role="region" aria-label="Photo upload and analysis">
       <div className="mb-6 text-center">
         <h2 className="mb-2 font-display text-xl text-white">Photo Analysis</h2>
         <p className="text-sm text-smoke">
@@ -178,6 +178,7 @@ export default function PhotoInput({ onFallback }: Props) {
             capture="environment"
             onChange={handleChange}
             className="hidden"
+            aria-label="Upload a photo for analysis"
           />
 
           <motion.div
@@ -230,9 +231,10 @@ export default function PhotoInput({ onFallback }: Props) {
             {!analyzing && (
               <button
                 onClick={clearPreview}
-                className="absolute right-3 top-3 rounded-full bg-forge-black/70 p-2 text-white transition hover:bg-forge-black"
+                className="absolute right-3 top-3 rounded-full bg-forge-black/70 p-2 text-white transition hover:bg-forge-black focus:outline-none focus:ring-2 focus:ring-gold-core"
+                aria-label="Remove photo"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
@@ -355,15 +357,25 @@ export default function PhotoInput({ onFallback }: Props) {
             )}
           </AnimatePresence>
 
-          {/* Error */}
+          {/* Error with fallback suggestion */}
           {error && (
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg bg-ember-glow/10 px-4 py-3 text-center text-sm text-ember-bright"
+              className="rounded-lg bg-ember-glow/10 px-4 py-3 text-center"
+              role="alert"
             >
-              {error}
-            </motion.p>
+              <p className="text-sm text-ember-bright">{error}</p>
+              <p className="mt-2 text-xs text-smoke">
+                Try a clearer full-body photo, or{" "}
+                <button
+                  onClick={() => onFallback()}
+                  className="text-gold-core underline hover:text-gold-bright focus:outline-none focus:ring-2 focus:ring-gold-core focus:ring-offset-2 focus:ring-offset-forge-charcoal"
+                >
+                  enter measurements manually
+                </button>
+              </p>
+            </motion.div>
           )}
 
           {/* Analyze button (before analysis) */}
