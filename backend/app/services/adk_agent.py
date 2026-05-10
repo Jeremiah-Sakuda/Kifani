@@ -47,6 +47,12 @@ from app.tools.generate_followups import (
     TOOL_DESCRIPTION as FOLLOWUP_DESCRIPTION,
     TOOL_PARAMETERS as FOLLOWUP_PARAMS,
 )
+from app.tools.search_grounding import (
+    search_grounding_tool,
+    SearchGroundingArgs,
+    TOOL_DESCRIPTION as GROUNDING_DESCRIPTION,
+    TOOL_PARAMETERS as GROUNDING_PARAMS,
+)
 
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
@@ -102,6 +108,11 @@ def _build_tools() -> Tool:
                 description=FOLLOWUP_DESCRIPTION,
                 parameters=FOLLOWUP_PARAMS,
             ),
+            FunctionDeclaration(
+                name="search_grounding",
+                description=GROUNDING_DESCRIPTION,
+                parameters=GROUNDING_PARAMS,
+            ),
         ]
     )
 
@@ -147,6 +158,14 @@ def _execute_tool(name: str, args: dict[str, Any]) -> dict[str, Any]:
             topics_covered=args.get("topics_covered"),
         )
         return generate_followups_tool(tool_args)
+
+    elif name == "search_grounding":
+        tool_args = SearchGroundingArgs(
+            archetype=args["archetype"],
+            sports=args["sports"],
+            is_paralympic_focus=args.get("is_paralympic_focus", False),
+        )
+        return search_grounding_tool(tool_args)
 
     else:
         return {"error": f"Unknown tool: {name}"}
@@ -371,6 +390,12 @@ def _build_match_prompt(user_input: dict[str, Any]) -> str:
         "2. Olympic sports that align with their build",
         "3. Paralympic sports that align with their build (with equal depth)",
         "4. Historical context about this archetype in Team USA history",
+        "5. Current Team USA momentum (use search_grounding tool)",
+        "",
+        "WORKFLOW:",
+        "1. Call match_archetype to get the archetype match",
+        "2. Call search_grounding with the matched archetype and its top sports to get current relevance",
+        "3. Synthesize historical context with current momentum in your narrative",
         "",
         f"IMPORTANT: If the initial match confidence is below {SECOND_OPINION_THRESHOLD:.0%}, "
         "call match_archetype again to get a second opinion with a broader perspective. "
@@ -389,6 +414,7 @@ def _get_tool_description(tool_name: str) -> str:
         "classify_paralympic": "Looking up Paralympic classification codes and eligibility",
         "regional_context": "Querying regional athlete data from BigQuery",
         "generate_followups": "Creating personalized follow-up questions",
+        "search_grounding": "Searching for current Team USA momentum in matched sports",
     }
     return descriptions.get(tool_name, f"Running {tool_name}")
 
@@ -400,6 +426,7 @@ def _get_tool_purpose(tool_name: str) -> str:
         "classify_paralympic": "IPC classification taxonomy lookup with 30+ codes",
         "regional_context": "BigQuery aggregation of athlete data by region",
         "generate_followups": "Context-aware question generation based on archetype and conversation",
+        "search_grounding": "Google Search grounding for current Team USA news and LA28 momentum",
     }
     return purposes.get(tool_name, "Processing")
 
@@ -425,6 +452,12 @@ def _summarize_result(tool_name: str, result: dict[str, Any]) -> str:
     elif tool_name == "generate_followups":
         questions = result.get("suggested_questions", [])
         return f"Generated {len(questions)} follow-up questions"
+
+    elif tool_name == "search_grounding":
+        snippets = result.get("grounded_snippets", [])
+        is_grounded = result.get("is_grounded", False)
+        status = "grounded" if is_grounded else "fallback"
+        return f"Found {len(snippets)} current relevance snippets ({status})"
 
     return "Tool completed"
 
