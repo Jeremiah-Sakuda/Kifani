@@ -85,6 +85,7 @@ export type StreamEventType =
   | "thinking"
   | "tool_call"
   | "tool_result"
+  | "validation"
   | "response"
   | "error"
   | "complete";

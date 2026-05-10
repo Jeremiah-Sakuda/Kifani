@@ -136,6 +136,13 @@ export function useStreamMatch() {
           break;
         }
 
+        case "validation": {
+          // Validation step from conditional language checker
+          const message = event.data.message as string;
+          addStep("thought", `Compliance check: ${message}`);
+          break;
+        }
+
         case "error": {
           const errorMessage = event.data.error as string;
           setError(errorMessage);
