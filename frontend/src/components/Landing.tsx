@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion, MotionValue } from "framer-motion";
 import InputModeSelector from "./InputModeSelector";
 import PhotoInput, { type PrefillData } from "./PhotoInput";
 import VoiceInput from "./VoiceInput";
@@ -25,7 +25,18 @@ const MONOLOGUE = [
 
 // --- Subcomponents for Scrollytelling ---
 
-const WordReveal = ({ text, progress, range }: { text: string; progress: any; range: [number, number] }) => {
+const Word = ({ word, progress, start, end, fadeOutStart, fadeOutEnd }: { word: string; progress: MotionValue<number>; start: number; end: number; fadeOutStart: number; fadeOutEnd: number }) => {
+  const opacity = useTransform(progress, [start, end, fadeOutStart, fadeOutEnd], [0, 1, 1, 0]);
+  const y = useTransform(progress, [start, end, fadeOutStart, fadeOutEnd], [20, 0, 0, -20]);
+
+  return (
+    <motion.span style={{ opacity, y, display: "inline-block", marginRight: "0.25em" }}>
+      {word}
+    </motion.span>
+  );
+};
+
+const WordReveal = ({ text, progress, range }: { text: string; progress: MotionValue<number>; range: [number, number] }) => {
   const words = text.split(" ");
   const step = (range[1] - range[0]) / words.length;
 
@@ -36,20 +47,41 @@ const WordReveal = ({ text, progress, range }: { text: string; progress: any; ra
         const end = start + step;
         const fadeOutStart = range[1] - 0.05;
 
-        const opacity = useTransform(progress, [start, end, fadeOutStart, range[1]], [0, 1, 1, 0]);
-        const y = useTransform(progress, [start, end, fadeOutStart, range[1]], [20, 0, 0, -20]);
-
         return (
-          <motion.span key={i} style={{ opacity, y, display: "inline-block", marginRight: "0.25em" }}>
-            {word}
-          </motion.span>
+          <Word 
+            key={i} 
+            word={word} 
+            progress={progress} 
+            start={start} 
+            end={end} 
+            fadeOutStart={fadeOutStart} 
+            fadeOutEnd={range[1]} 
+          />
         );
       })}
     </span>
   );
 };
 
-const CinematicBackground = ({ progress }: { progress: any }) => {
+const Ember = ({ progress, top, left, xRange }: { progress: MotionValue<number>; top: string; left: string; xRange: number }) => {
+  const x = useTransform(progress, [0.7, 1], [0, xRange]);
+  const opacity = useTransform(progress, [0.7, 0.8, 1], [0, 1, 0]);
+  
+  return (
+    <motion.div
+      className="absolute w-1 h-1 rounded-full bg-gold-core"
+      style={{
+        top,
+        left,
+        x,
+        opacity,
+        boxShadow: "0 0 10px var(--color-gold-core)"
+      }}
+    />
+  );
+};
+
+const CinematicBackground = ({ progress }: { progress: MotionValue<number> }) => {
   // 1. Rings
   const ringsOpacity = useTransform(progress, [0, 0.15, 0.25], [0, 1, 0]);
   const ringsScale = useTransform(progress, [0, 0.25], [0.8, 1.2]);
@@ -94,16 +126,12 @@ const CinematicBackground = ({ progress }: { progress: any }) => {
       {/* 4. Shatter Embers */}
       <motion.div style={{ opacity: shatterOpacity, y: shatterY }} className="absolute inset-0">
         {Array.from({ length: 25 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-gold-core"
-            style={{
-              top: `${50 + (Math.random() * 40 - 20)}%`,
-              left: `${50 + (Math.random() * 40 - 20)}%`,
-              x: useTransform(progress, [0.7, 1], [0, (Math.random() - 0.5) * 500]),
-              opacity: useTransform(progress, [0.7, 0.8, 1], [0, 1, 0]),
-              boxShadow: "0 0 10px var(--color-gold-core)"
-            }}
+          <Ember 
+            key={i} 
+            progress={progress} 
+            top={`${50 + (Math.random() * 40 - 20)}%`} 
+            left={`${50 + (Math.random() * 40 - 20)}%`} 
+            xRange={(Math.random() - 0.5) * 500} 
           />
         ))}
       </motion.div>
