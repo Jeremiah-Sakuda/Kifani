@@ -1,8 +1,8 @@
 """
 Tests for Gemini-based conditional language validator.
 
-This tests the "Gemini auditing Gemini" pattern — using Gemini 2.5 Flash
-to validate outputs from Gemini 2.5 Pro for conditional language compliance.
+This tests the "Gemini auditing Gemini" pattern — using Gemini 3.1 Flash
+to validate outputs from Gemini 3.1 Pro for conditional language compliance.
 
 These tests verify:
 1. Definitive language is caught and rewritten
@@ -30,7 +30,7 @@ class TestValidationResult:
             validated_text="Test validated",
             was_modified=True,
             validation_trace="Test trace",
-            model="gemini-2.5-flash",
+            model="gemini-3.1-flash",
             input_length=13,
             output_length=14,
             latency_ms=50.5,
@@ -41,7 +41,7 @@ class TestValidationResult:
         assert result.validated_text == "Test validated"
         assert result.was_modified is True
         assert result.validation_trace == "Test trace"
-        assert result.model == "gemini-2.5-flash"
+        assert result.model == "gemini-3.1-flash"
         assert result.input_length == 13
         assert result.output_length == 14
         assert result.latency_ms == 50.5
@@ -56,7 +56,7 @@ class TestValidationResult:
             validation_trace="No changes",
         )
 
-        assert result.model == "gemini-2.5-flash"
+        assert result.model == "gemini-3.1-flash"
         assert result.input_length == 0
         assert result.output_length == 0
         assert result.latency_ms == 0.0

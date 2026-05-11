@@ -1,7 +1,7 @@
 """
 FORGED — ADK Agent Orchestrator
 
-Orchestrates the 4 archetype tools with Gemini 2.5 Pro using Google's ADK pattern.
+Orchestrates the 4 archetype tools with Gemini 3.1 Pro using Google's ADK pattern.
 Yields streaming events for real-time reasoning trace display.
 """
 
@@ -58,13 +58,13 @@ from app.tools.search_grounding import (
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "gemini-2.5-pro"
+MODEL_NAME = "gemini-3.1-pro"
 
 
 class EventType(str, Enum):
     """SSE event types for reasoning trace."""
     THINKING = "thinking"
-    REASONING = "reasoning"  # Gemini 2.5 Pro thinking traces
+    REASONING = "reasoning"  # Gemini 3.1 Pro thinking traces
     TOOL_CALL = "tool_call"
     TOOL_RESULT = "tool_result"
     VALIDATION = "validation"
@@ -178,7 +178,7 @@ def _get_model() -> GenerativeModel:
     """Initialize and return the Gemini model with thinking enabled."""
     aiplatform.init(project=PROJECT_ID, location=LOCATION)
 
-    # Enable thinking for Gemini 2.5 Pro
+    # Enable thinking for Gemini 3.1 Pro
     generation_config = GenerationConfig(
         temperature=0.7,
         top_p=0.95,
@@ -196,9 +196,9 @@ def _get_model() -> GenerativeModel:
 
 async def _extract_thinking_traces(response) -> AsyncIterator[StreamEvent]:
     """
-    Extract thinking/reasoning traces from Gemini 2.5 Pro response.
+    Extract thinking/reasoning traces from Gemini 3.1 Pro response.
 
-    Gemini 2.5 Pro can include internal reasoning in its responses.
+    Gemini 3.1 Pro can include internal reasoning in its responses.
     This function extracts those traces and yields them as REASONING events.
     """
     if not hasattr(response, 'candidates') or not response.candidates:
@@ -210,7 +210,7 @@ async def _extract_thinking_traces(response) -> AsyncIterator[StreamEvent]:
 
         for part in candidate.content.parts:
             # Check for thought/reasoning content
-            # Gemini 2.5 Pro may expose thinking via different attributes
+            # Gemini 3.1 Pro may expose thinking via different attributes
             thought_text = None
 
             # Check for explicit thought attribute

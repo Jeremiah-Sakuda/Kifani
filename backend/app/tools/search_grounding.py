@@ -52,8 +52,8 @@ def search_grounding_tool(args: SearchGroundingArgs) -> dict[str, Any]:
     try:
         aiplatform.init(project=PROJECT_ID, location=LOCATION)
 
-        # Use Gemini 2.5 Flash for grounding
-        model = GenerativeModel("gemini-2.5-flash")
+        # Use Gemini 3.1 Flash for grounding
+        model = GenerativeModel("gemini-3.1-flash")
 
         # Build search-grounded prompt
         sport_type = "Paralympic" if args.is_paralympic_focus else "Olympic"

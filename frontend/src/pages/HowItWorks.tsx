@@ -38,7 +38,7 @@ const TOOLS = [
 const GEMINI_FEATURES = [
   {
     name: "Thinking Traces",
-    description: "Gemini 2.5 Pro reasoning is streamed in real-time, showing how the agent decides which tools to call.",
+    description: "Gemini 3.1 Pro reasoning is streamed in real-time, showing how the agent decides which tools to call.",
   },
   {
     name: "Context Caching",
@@ -69,7 +69,7 @@ export default function HowItWorks() {
               How FORGED Works
             </h1>
             <p className="text-lg text-smoke">
-              A Gemini 2.5 Pro-powered agent that matches you to Team USA archetypes
+              A Gemini 3.1 Pro-powered agent that matches you to Team USA archetypes
             </p>
           </motion.div>
         </div>
@@ -105,7 +105,7 @@ export default function HowItWorks() {
               {/* Gemini Agent */}
               <div className="flex flex-col items-center">
                 <div className="rounded-xl border border-gold-core/30 bg-forge-steel/50 px-6 py-4 text-center">
-                  <p className="font-mono text-sm text-gold-core">Gemini 2.5 Pro</p>
+                  <p className="font-mono text-sm text-gold-core">Gemini 3.1 Pro</p>
                   <p className="text-xs text-smoke">ADK Agent</p>
                 </div>
               </div>
@@ -165,7 +165,7 @@ export default function HowItWorks() {
       <section className="border-b border-forge-graphite px-6 py-16">
         <div className="mx-auto max-w-4xl">
           <h2 className="mb-8 text-center font-display text-2xl text-white">
-            Gemini 2.5 Pro Capabilities
+            Gemini 3.1 Pro Capabilities
           </h2>
           <div className="grid gap-6 md:grid-cols-2">
             {GEMINI_FEATURES.map((feature, i) => (

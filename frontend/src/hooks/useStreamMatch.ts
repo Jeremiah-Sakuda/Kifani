@@ -17,7 +17,7 @@ export interface ToolCall {
 
 export interface ReasoningStep {
   id: string;
-  type: "thought" | "tool" | "reasoning";  // reasoning = Gemini 2.5 Pro thinking traces
+  type: "thought" | "tool" | "reasoning";  // reasoning = Gemini 3.1 Pro thinking traces
   content: string;
   timestamp: number;
 }
@@ -100,7 +100,7 @@ export function useStreamMatch() {
         }
 
         case "reasoning": {
-          // Gemini 2.5 Pro thinking traces - show with distinct styling
+          // Gemini 3.1 Pro thinking traces - show with distinct styling
           const thought = event.data.thought as string;
           if (thought) {
             addStep("reasoning", thought);

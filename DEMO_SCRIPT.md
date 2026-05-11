@@ -21,8 +21,8 @@
 * Reveal the Match: e.g., "The Powerhouse" or "Adaptive Power".
 
 **[Audio / Voiceover]**
-"FORGED supports multimodal input—fans can use a photo, voice, or text. Behind the scenes, we use Gemini 2.0 Flash to extract physical traits. 
-Next, our backend orchestrated by Gemini 2.5 Pro springs into action. Using function calling, it streams its reasoning trace live via Server-Sent Events, so the user sees exactly how the AI is clustering their traits. 
+"FORGED supports multimodal input—fans can use a photo, voice, or text. Behind the scenes, we use Gemini 3.1 Flash to extract physical traits. 
+Next, our backend orchestrated by Gemini 3.1 Pro springs into action. Using function calling, it streams its reasoning trace live via Server-Sent Events, so the user sees exactly how the AI is clustering their traits. 
 Here, we’ve been matched with the *Powerhouse* archetype."
 
 ## 1:15 - 1:45 | Digital Mirror & Paralympic Parity
@@ -46,7 +46,7 @@ We also built FORGED with structural Paralympic parity. Olympic and Paralympic d
 **[Audio / Voiceover]**
 "Let’s look under the hood. FORGED is completely serverless, deployed on Google Cloud Run. 
 Our biometric data spans 14,000 public records housed in BigQuery. 
-The magic happens with Vertex AI. We use Gemini 2.5 Pro as our core agent, executing five specialized tools—from K-means clustering to semantic matching using the `text-embedding-005` model. We also use Vertex AI Context Caching to efficiently reuse our massive archetype corpus across sessions, and Google Search Grounding to connect historical body types with sports featuring at the upcoming LA28 Games."
+The magic happens with Vertex AI. We use Gemini 3.1 Pro as our core agent, executing five specialized tools—from K-means clustering to semantic matching using the `text-embedding-005` model. We also use Vertex AI Context Caching to efficiently reuse our massive archetype corpus across sessions, and Google Search Grounding to connect historical body types with sports featuring at the upcoming LA28 Games."
 
 ## 2:45 - 3:00 | Outro
 **[Visual]** 

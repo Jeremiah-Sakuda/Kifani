@@ -30,11 +30,11 @@ The 8 archetypes include 2 Paralympic-first categories (Adaptive Power, Adaptive
 
 **Frontend:** React 19 + TypeScript + Vite + Tailwind CSS, with D3.js for the Digital Mirror visualization and Framer Motion for animations.
 
-**Backend:** FastAPI (Python 3.12) with a Gemini 2.5 Pro agent orchestrating 4 specialized tools via function calling.
+**Backend:** FastAPI (Python 3.12) with a Gemini 3.1 Pro agent orchestrating 4 specialized tools via function calling.
 
 **Google Cloud Stack:**
-- **Vertex AI Gemini 2.5 Pro** — Agent orchestration with function calling
-- **Vertex AI Gemini 2.0 Flash** — Photo/voice analysis + conditional language validation
+- **Vertex AI Gemini 3.1 Pro** — Agent orchestration with function calling
+- **Vertex AI Gemini 3.1 Flash** — Photo/voice analysis + conditional language validation
 - **Vertex AI Imagen 3.0** — Non-photorealistic archetype portraits
 - **BigQuery** — 14,218 Olympic athlete records + 30+ Paralympic classification taxonomy
 - **Firestore** — Session persistence for multi-turn conversations

@@ -15,7 +15,7 @@ from vertexai.generative_models import GenerativeModel, Part
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "gemini-2.5-flash"
+MODEL_NAME = "gemini-3.1-flash"
 
 # Extraction prompt for voice-described measurements
 EXTRACTION_PROMPT = """You are extracting physical measurements from a voice description.

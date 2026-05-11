@@ -193,7 +193,7 @@ async def get_or_create_vertex_cache() -> Any:
         corpus = get_full_corpus()
 
         cache = vertex_caching.CachedContent.create(
-            model_name="gemini-2.5-pro",
+            model_name="gemini-3.1-pro",
             display_name=CACHE_DISPLAY_NAME,
             system_instruction="You are FORGED, a Team USA archetype matching agent. Use the cached corpus to provide accurate archetype information.",
             contents=[Part.from_text(corpus)],

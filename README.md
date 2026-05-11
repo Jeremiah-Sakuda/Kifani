@@ -22,7 +22,7 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 
 | Requirement | Implementation |
 |-------------|----------------|
-| Gemini API for analysis/generation | Gemini 2.5 Pro (agent orchestration), Gemini 2.0 Flash (validation, multimodal analysis) |
+| Gemini API for analysis/generation | Gemini 3.1 Pro (agent orchestration), Gemini 3.1 Flash (validation, multimodal analysis) |
 | Deployed on Google Cloud | Cloud Run (frontend + backend) |
 | Public datasets only | Olympedia, IPC Historical Results, public census data |
 | Paralympic parity | 2 dedicated Paralympic-first archetypes, 30+ classification explainers, sample weighting |
@@ -82,7 +82,7 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 │                    FastAPI + Python 3.12                           │
 │                                                                     │
 │  ┌─────────────────────────────────────────────────────────────┐   │
-│  │                    ADK AGENT (Gemini 2.5 Pro)               │   │
+│  │                    ADK AGENT (Gemini 3.1 Pro)               │   │
 │  │  ┌──────────────┐ ┌──────────────┐ ┌──────────────────────┐ │   │
 │  │  │ match_       │ │ classify_    │ │ generate_            │ │   │
 │  │  │ archetype    │ │ paralympic   │ │ followups            │ │   │
@@ -110,8 +110,8 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 
 | Service | Usage |
 |---------|-------|
-| **Vertex AI — Gemini 2.5 Pro** | Agent orchestration with 5-tool function calling + thinking traces |
-| **Vertex AI — Gemini 2.0 Flash** | Photo analysis, voice transcription, conditional language validation |
+| **Vertex AI — Gemini 3.1 Pro** | Agent orchestration with 5-tool function calling + thinking traces |
+| **Vertex AI — Gemini 3.1 Flash** | Photo analysis, voice transcription, conditional language validation |
 | **Vertex AI — Imagen 3.0** | Non-photorealistic archetype portrait generation |
 | **Vertex AI — text-embedding-005** | Semantic similarity matching for dual-signal results |
 | **Vertex AI — Context Caching** | Cached archetype corpus for efficient reuse across sessions |
@@ -130,7 +130,7 @@ This project addresses **Challenge 4: Athlete Archetype Agent** — a clustering
 Not a checkbox feature — Two archetypes (Adaptive Power, Adaptive Endurance) are Paralympic-first, with expert-defined centroids matching Paralympic sport requirements. 30+ classification codes documented with full explanations, providing equal analytical depth to Paralympic sports.
 
 ### 2. Real Agentic Orchestration
-Gemini 2.5 Pro with function calling orchestrates 5 specialized tools. Thinking traces stream via SSE in real-time. Not simulated loading spinners — actual tool execution and reasoning visible to users.
+Gemini 3.1 Pro with function calling orchestrates 5 specialized tools. Thinking traces stream via SSE in real-time. Not simulated loading spinners — actual tool execution and reasoning visible to users.
 
 ### 2.5 Dual-Signal Matching
 K-means clustering provides biometric matching, while text-embedding-005 enables semantic matching from natural language descriptions. When both signals agree, confidence increases. Google Search grounding connects results to current Team USA athletes.
@@ -182,7 +182,7 @@ Each archetype has a unique Imagen-generated stylized portrait. Non-photorealist
 │   │   │   ├── paralympic.py          # Classification exploration
 │   │   │   └── era.py                 # Historical era evolution
 │   │   ├── services/
-│   │   │   ├── adk_agent.py           # Gemini 2.5 Pro orchestration
+│   │   │   ├── adk_agent.py           # Gemini 3.1 Pro orchestration
 │   │   │   ├── clustering.py          # K-means matching algorithm
 │   │   │   ├── conditional_language.py # Compliance phrasing layer
 │   │   │   ├── context_cache.py       # Vertex AI context caching

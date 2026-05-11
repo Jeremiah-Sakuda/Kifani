@@ -309,8 +309,8 @@ export default function About() {
             <h2 className="mb-6 font-display text-2xl text-white">Technology Stack</h2>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { name: "Gemini 2.5 Pro", cat: "Agent Engine" },
-                { name: "Gemini 2.0 Flash", cat: "Validation" },
+                { name: "Gemini 3.1 Pro", cat: "Agent Engine" },
+                { name: "Gemini 3.1 Flash", cat: "Validation" },
                 { name: "Imagen 3.0", cat: "Archetype Art" },
                 { name: "BigQuery", cat: "16K+ Records" },
                 { name: "Firestore", cat: "Persistence" },
