@@ -180,16 +180,22 @@ export default function Results() {
         <div className="absolute bottom-0 left-0 h-[600px] w-[600px] translate-y-1/4 -translate-x-1/4 rounded-full bg-ember-glow/[0.02] blur-[120px]" />
       </div>
 
-      <div className="shell relative z-10 py-12 lg:py-16">
-        {/* Back Link */}
+      {/* ──────────────────────────────────────────────────────────────────
+          FORGED Intro — full-viewport title with scroll prompt.
+          Sits above the results so the page opens with a clear brand
+          beat and signals that there's more below.
+      ────────────────────────────────────────────────────────────────── */}
+      <section className="relative z-10 flex min-h-screen w-full flex-col items-center justify-center px-6 py-20 text-center">
+        {/* Persistent back link (top-left, anchored to the hero) */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.1 }}
+          className="absolute left-6 top-8 md:left-10 md:top-10"
         >
           <Link
             to="/"
-            className="mb-12 inline-flex items-center gap-2 text-sm text-smoke transition hover:text-gold-core"
+            className="inline-flex items-center gap-2 text-sm text-smoke transition hover:text-gold-core"
           >
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -198,6 +204,74 @@ export default function Results() {
           </Link>
         </motion.div>
 
+        {/* Eyebrow */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-8 text-xs uppercase tracking-[0.4em] text-ash"
+        >
+          Your Archetype Has Been
+        </motion.p>
+
+        {/* FORGED wordmark */}
+        <motion.h1
+          initial={{ opacity: 0, scale: 0.94, letterSpacing: "0.4em" }}
+          animate={{ opacity: 1, scale: 1, letterSpacing: "0em" }}
+          transition={{ duration: 1.2, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="font-display text-7xl leading-none text-white drop-shadow-2xl md:text-9xl xl:text-[12rem]"
+        >
+          <span className="bg-gradient-to-br from-white via-platinum to-silver bg-clip-text text-transparent">
+            FORGED
+          </span>
+        </motion.h1>
+
+        {/* Divider + tagline */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.2 }}
+          className="mt-10 flex items-center gap-4"
+        >
+          <div className="h-px w-12 bg-gradient-to-r from-transparent to-gold-core/40" />
+          <span className="font-mono text-xs uppercase tracking-[0.3em] text-gold-core/80">
+            Team USA Olympic Match
+          </span>
+          <div className="h-px w-12 bg-gradient-to-l from-transparent to-gold-core/40" />
+        </motion.div>
+
+        {/* Scroll prompt */}
+        <motion.button
+          type="button"
+          onClick={() => {
+            document
+              .getElementById("results-content")
+              ?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 1.8 }}
+          className="group absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 text-smoke transition hover:text-gold-core focus:text-gold-core focus:outline-none"
+          aria-label="Scroll to your archetype results"
+        >
+          <span className="text-[10px] uppercase tracking-[0.4em]">
+            Scroll to Reveal
+          </span>
+          <motion.div
+            animate={{ y: [0, 8, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="flex h-10 w-6 items-start justify-center rounded-full border border-current p-1.5"
+          >
+            <motion.span
+              animate={{ y: [0, 10, 0], opacity: [1, 0.2, 1] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+              className="block h-1.5 w-1 rounded-full bg-current"
+            />
+          </motion.div>
+        </motion.button>
+      </section>
+
+      <div id="results-content" className="shell relative z-10 py-12 lg:py-16">
         {/* Hero Section - Archetype Reveal */}
         <motion.section
           variants={stagger}

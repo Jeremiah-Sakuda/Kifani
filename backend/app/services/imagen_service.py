@@ -15,7 +15,7 @@ from google.genai import types
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "gemini-2.5-flash-image"
+MODEL_NAME = "gemini-2.5-flash"
 
 # Archetype-specific prompt elements
 ARCHETYPE_STYLES: dict[str, dict[str, str]] = {
