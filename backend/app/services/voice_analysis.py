@@ -23,40 +23,42 @@ The person is describing their height, weight, and physical characteristics for 
 
 Listen to the audio and extract any mentioned physical traits.
 
-Return a JSON object with:
+Return ONLY a valid JSON object matching this exact structure:
 {
-  "success": true/false,
+  "success": true,
   "transcript": "the full transcription of what was said",
-  "confidence": 0.0-1.0 (confidence in extracted values),
+  "confidence": 0.85,
   "extracted": {
     "height": {
-      "value_cm": number or null,
-      "raw_text": "what they said about height",
-      "confidence": 0.0-1.0
+      "value_cm": 175.0,
+      "raw_text": "I am 5 foot 9",
+      "confidence": 0.9
     },
     "weight": {
-      "value_kg": number or null,
-      "raw_text": "what they said about weight",
-      "confidence": 0.0-1.0
+      "value_kg": 75.0,
+      "raw_text": "around 165 pounds",
+      "confidence": 0.9
     },
     "arm_span": {
-      "value_cm": number or null,
-      "raw_text": "what they said about arm span",
-      "confidence": 0.0-1.0
+      "value_cm": null,
+      "raw_text": "",
+      "confidence": 0.0
     },
-    "activity_preferences": ["list", "of", "mentioned", "activities"],
-    "build_description": "any qualitative description of their build"
+    "activity_preferences": ["running", "swimming"],
+    "build_description": "lean and athletic"
   },
-  "missing_required": ["height" and/or "weight" if not mentioned],
-  "clarification_needed": ["list of things that need clarification"]
+  "missing_required": ["arm_span"],
+  "clarification_needed": []
 }
 
-Unit conversions:
-- feet/inches to cm: (feet * 12 + inches) * 2.54
-- pounds to kg: lbs * 0.453592
-
-If the audio is unclear or doesn't contain physical descriptions:
-{"success": false, "reason": "explanation", "transcript": "best effort transcription"}
+Rules:
+- "confidence" fields must be a float between 0.0 and 1.0.
+- Use `null` (not string "null") if a value is not mentioned.
+- Unit conversions:
+  - feet/inches to cm: (feet * 12 + inches) * 2.54
+  - pounds to kg: lbs * 0.453592
+- If the audio is unclear or doesn't contain physical descriptions, return:
+  {"success": false, "reason": "explanation", "transcript": "best effort transcription"}
 
 Only output valid JSON, no other text."""
 

@@ -23,39 +23,38 @@ EXTRACTION_PROMPT = """Analyze this full-body photo and estimate the person's ph
 IMPORTANT: You are estimating proportions for athletic archetype matching, not medical diagnosis.
 Be conservative with estimates and indicate low confidence if the image quality or pose makes accurate estimation difficult.
 
-Return a JSON object with:
+Return ONLY a valid JSON object matching this exact structure:
 {
-  "success": true/false,
-  "confidence": 0.0-1.0 (overall confidence in estimates),
+  "success": true,
+  "confidence": 0.85,
   "estimates": {
     "height_range": {
-      "low_cm": number,
-      "high_cm": number,
-      "best_estimate_cm": number,
-      "confidence": 0.0-1.0
+      "low_cm": 170.0,
+      "high_cm": 180.0,
+      "best_estimate_cm": 175.0,
+      "confidence": 0.8
     },
     "weight_range": {
-      "low_kg": number,
-      "high_kg": number,
-      "best_estimate_kg": number,
-      "confidence": 0.0-1.0
+      "low_kg": 70.0,
+      "high_kg": 80.0,
+      "best_estimate_kg": 75.0,
+      "confidence": 0.7
     },
-    "build_type": "lean" | "average" | "muscular" | "heavy",
+    "build_type": "average",
     "proportions": {
-      "arm_span_ratio": number (ratio to height, typically 0.95-1.05),
-      "leg_to_torso_ratio": "short" | "average" | "long"
+      "arm_span_ratio": 1.02,
+      "leg_to_torso_ratio": "average"
     }
   },
-  "observations": [
-    "string describing notable physical characteristics"
-  ],
-  "limitations": [
-    "string describing why confidence might be lower"
-  ]
+  "observations": ["Long limbs", "Lean build"],
+  "limitations": ["Baggy clothing obscures precise waist measurement"]
 }
 
-If you cannot make reasonable estimates (e.g., not a full-body photo, obscured view, etc.),
-return: {"success": false, "reason": "explanation"}
+Rules:
+- "confidence" fields must be a float between 0.0 and 1.0.
+- "build_type" must be one of: "lean", "average", "muscular", "heavy".
+- "leg_to_torso_ratio" must be one of: "short", "average", "long".
+- "success" should be false if you cannot make reasonable estimates (e.g., not a full-body photo). In that case, return {"success": false, "reason": "explanation"}.
 
 Only output valid JSON, no other text."""
 
