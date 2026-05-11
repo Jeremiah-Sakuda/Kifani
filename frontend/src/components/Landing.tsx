@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import InputModeSelector from "./InputModeSelector";
@@ -23,6 +23,94 @@ const MONOLOGUE = [
   "It's time to discover what you were built for.",
 ];
 
+// --- Subcomponents for Scrollytelling ---
+
+const WordReveal = ({ text, progress, range }: { text: string; progress: any; range: [number, number] }) => {
+  const words = text.split(" ");
+  const step = (range[1] - range[0]) / words.length;
+
+  return (
+    <span className="inline-block pointer-events-none">
+      {words.map((word, i) => {
+        const start = range[0] + i * step;
+        const end = start + step;
+        const fadeOutStart = range[1] - 0.05;
+
+        const opacity = useTransform(progress, [start, end, fadeOutStart, range[1]], [0, 1, 1, 0]);
+        const y = useTransform(progress, [start, end, fadeOutStart, range[1]], [20, 0, 0, -20]);
+
+        return (
+          <motion.span key={i} style={{ opacity, y, display: "inline-block", marginRight: "0.25em" }}>
+            {word}
+          </motion.span>
+        );
+      })}
+    </span>
+  );
+};
+
+const CinematicBackground = ({ progress }: { progress: any }) => {
+  // 1. Rings
+  const ringsOpacity = useTransform(progress, [0, 0.15, 0.25], [0, 1, 0]);
+  const ringsScale = useTransform(progress, [0, 0.25], [0.8, 1.2]);
+  
+  // 2. Particles
+  const particlesOpacity = useTransform(progress, [0.2, 0.35, 0.5], [0, 1, 0]);
+  const particlesY = useTransform(progress, [0.2, 0.5], [100, -100]);
+
+  // 3. Silhouette
+  const silhouetteOpacity = useTransform(progress, [0.45, 0.6, 0.75], [0, 1, 0]);
+  const silhouetteScale = useTransform(progress, [0.45, 0.75], [0.9, 1.1]);
+
+  // 4. Shatter / Embers
+  const shatterOpacity = useTransform(progress, [0.7, 0.85, 1], [0, 1, 0]);
+  const shatterY = useTransform(progress, [0.7, 1], [0, -300]);
+
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none flex items-center justify-center">
+      {/* 1. Rings */}
+      <motion.div style={{ opacity: ringsOpacity, scale: ringsScale }} className="absolute flex items-center justify-center">
+        <div className="w-[60vh] h-[60vh] rounded-full border border-gold-core/20 absolute -translate-x-1/4 -translate-y-1/4" />
+        <div className="w-[60vh] h-[60vh] rounded-full border border-white/10 absolute translate-x-1/4 translate-y-1/4" />
+        <div className="w-[60vh] h-[60vh] rounded-full border border-ember-glow/20 absolute -translate-x-1/4 translate-y-1/4" />
+      </motion.div>
+
+      {/* 2. Particles */}
+      <motion.div style={{ opacity: particlesOpacity, y: particlesY }} className="absolute inset-0">
+        <div className="absolute top-[30%] left-[20%] w-2 h-2 rounded-full bg-white shadow-[0_0_15px_#fff]" />
+        <div className="absolute top-[60%] left-[80%] w-3 h-3 rounded-full bg-gold-core shadow-[0_0_20px_var(--color-gold-core)]" />
+        <div className="absolute top-[20%] left-[70%] w-1 h-1 rounded-full bg-ember-glow shadow-[0_0_10px_var(--color-ember-glow)]" />
+        <div className="absolute top-[70%] left-[30%] w-4 h-4 rounded-full bg-white/50 blur-[2px]" />
+        <div className="absolute top-[40%] left-[50%] w-2 h-2 rounded-full bg-gold-core/80" />
+      </motion.div>
+
+      {/* 3. Silhouette */}
+      <motion.div style={{ opacity: silhouetteOpacity, scale: silhouetteScale }} className="absolute">
+        <svg viewBox="0 0 100 200" className="w-[40vh] h-[80vh] fill-white/5 blur-[20px]">
+           <path d="M30,50 Q50,20 70,50 T70,120 Q50,150 30,120 Z" />
+        </svg>
+      </motion.div>
+
+      {/* 4. Shatter Embers */}
+      <motion.div style={{ opacity: shatterOpacity, y: shatterY }} className="absolute inset-0">
+        {Array.from({ length: 25 }).map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full bg-gold-core"
+            style={{
+              top: `${50 + (Math.random() * 40 - 20)}%`,
+              left: `${50 + (Math.random() * 40 - 20)}%`,
+              x: useTransform(progress, [0.7, 1], [0, (Math.random() - 0.5) * 500]),
+              opacity: useTransform(progress, [0.7, 0.8, 1], [0, 1, 0]),
+              boxShadow: "0 0 10px var(--color-gold-core)"
+            }}
+          />
+        ))}
+      </motion.div>
+    </div>
+  );
+};
+
 function ScrollytellingIntro() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -30,24 +118,39 @@ function ScrollytellingIntro() {
     offset: ["start start", "end end"],
   });
 
-  // Calculate opacities for the 4 sentences based on scroll progress
-  const opacity1 = useTransform(scrollYProgress, [0, 0.05, 0.2, 0.25], [0, 1, 1, 0]);
-  const y1 = useTransform(scrollYProgress, [0, 0.05, 0.2, 0.25], [20, 0, 0, -20]);
-
-  const opacity2 = useTransform(scrollYProgress, [0.25, 0.3, 0.45, 0.5], [0, 1, 1, 0]);
-  const y2 = useTransform(scrollYProgress, [0.25, 0.3, 0.45, 0.5], [20, 0, 0, -20]);
-
-  const opacity3 = useTransform(scrollYProgress, [0.5, 0.55, 0.7, 0.75], [0, 1, 1, 0]);
-  const y3 = useTransform(scrollYProgress, [0.5, 0.55, 0.7, 0.75], [20, 0, 0, -20]);
-
-  const opacity4 = useTransform(scrollYProgress, [0.75, 0.8, 0.95, 1], [0, 1, 1, 0]);
-  const y4 = useTransform(scrollYProgress, [0.75, 0.8, 0.95, 1], [20, 0, 0, -20]);
-
-  const opacities = [opacity1, opacity2, opacity3, opacity4];
-  const ys = [y1, y2, y3, y4];
-
-  // Background container completely fades out at the very end
   const bgOpacity = useTransform(scrollYProgress, [0.95, 1], [1, 0]);
+
+  // Audio Logic
+  const [isMuted, setIsMuted] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // Placeholder audio element. 
+    // Requires 'ambient.mp3' in public directory for actual sound.
+    audioRef.current = new Audio("/ambient.mp3");
+    audioRef.current.loop = true;
+    return () => {
+      audioRef.current?.pause();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isMuted && audioRef.current) {
+      audioRef.current.play().catch(() => setIsMuted(true));
+    } else if (audioRef.current) {
+      audioRef.current.pause();
+    }
+  }, [isMuted]);
+
+  useEffect(() => {
+    return scrollYProgress.onChange((v) => {
+      if (audioRef.current && !isMuted) {
+        // Volume swells in the middle, fades out at ends
+        const vol = v < 0.5 ? v * 2 : (1 - v) * 2;
+        audioRef.current.volume = Math.max(0, Math.min(1, vol));
+      }
+    });
+  }, [scrollYProgress, isMuted]);
 
   return (
     <div ref={containerRef} className="relative h-[400vh] w-full bg-forge-black">
@@ -55,23 +158,48 @@ function ScrollytellingIntro() {
         style={{ opacity: bgOpacity }} 
         className="sticky top-0 flex h-screen w-full items-center justify-center overflow-hidden"
       >
-        {/* Soft pulsing background glow */}
-        <motion.div
-          animate={{ scale: [1, 1.05, 1], opacity: [0.1, 0.2, 0.1] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--color-gold-core)_0%,_transparent_60%)] mix-blend-screen blur-[100px]"
-        />
+        <CinematicBackground progress={scrollYProgress} />
 
-        <div className="relative z-10 flex h-full w-full max-w-5xl items-center justify-center px-8 text-center">
-          {MONOLOGUE.map((text, i) => (
-            <motion.p
-              key={i}
-              style={{ opacity: opacities[i], y: ys[i] }}
-              className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl"
-            >
-              {text}
-            </motion.p>
-          ))}
+        {/* Vertical Progress Indicator */}
+        <div className="absolute left-8 top-1/2 -translate-y-1/2 h-64 w-[2px] bg-white/10 z-20 rounded-full overflow-hidden">
+          <motion.div 
+            className="w-full bg-gold-core shadow-[0_0_10px_var(--color-gold-core)] origin-top"
+            style={{ scaleY: scrollYProgress, height: "100%" }}
+          />
+        </div>
+
+        {/* Audio Toggle */}
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          className="absolute top-8 right-12 z-20 flex items-center gap-2 text-xs uppercase tracking-widest text-smoke transition hover:text-white"
+        >
+          {isMuted ? (
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+            </svg>
+          ) : (
+            <svg className="w-4 h-4 text-gold-core" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+            </svg>
+          )}
+          {isMuted ? "Sound Off" : "Sound On"}
+        </button>
+
+        {/* Text Sequence */}
+        <div className="relative z-10 flex h-full w-full max-w-5xl items-center justify-center px-16 text-center pointer-events-none">
+          <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
+            <WordReveal text={MONOLOGUE[0]} progress={scrollYProgress} range={[0, 0.25]} />
+          </motion.div>
+          <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
+            <WordReveal text={MONOLOGUE[1]} progress={scrollYProgress} range={[0.25, 0.5]} />
+          </motion.div>
+          <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
+            <WordReveal text={MONOLOGUE[2]} progress={scrollYProgress} range={[0.5, 0.75]} />
+          </motion.div>
+          <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
+            <WordReveal text={MONOLOGUE[3]} progress={scrollYProgress} range={[0.75, 1]} />
+          </motion.div>
         </div>
 
         <a
@@ -89,12 +217,22 @@ function ScrollytellingIntro() {
   );
 }
 
+// --- Main App Component ---
+
 export default function Landing() {
   const navigate = useNavigate();
   const [inputMode, setInputMode] = useState<InputMode>("form");
   const [prefillData, setPrefillData] = useState<PrefillData | undefined>();
   const [showDemoOptions, setShowDemoOptions] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+
+  // App Reveal Parallax
+  const appRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: appScrollProgress } = useScroll({
+    target: appRef,
+    offset: ["start end", "start start"],
+  });
+  const appY = useTransform(appScrollProgress, [0, 1], [150, 0]);
 
   const handleFallbackToForm = (data?: PrefillData) => {
     setPrefillData(data);
@@ -119,7 +257,12 @@ export default function Landing() {
       {!prefersReducedMotion && <ScrollytellingIntro />}
 
       {/* Main App Section */}
-      <div id="app" className="relative min-h-screen overflow-hidden bg-forge-black">
+      <motion.div 
+        id="app" 
+        ref={appRef}
+        style={{ y: prefersReducedMotion ? 0 : appY }}
+        className="relative min-h-screen overflow-hidden bg-forge-black"
+      >
         {/* Background Effects */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <motion.div
@@ -412,7 +555,7 @@ export default function Landing() {
         <div className="relative z-10 border-t border-white/5 bg-forge-black py-20">
           <ArchetypePreview />
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
