@@ -25,41 +25,15 @@ const MONOLOGUE = [
 
 // --- Subcomponents for Scrollytelling ---
 
-const Word = ({ word, progress, start, end, fadeOutStart, fadeOutEnd }: { word: string; progress: MotionValue<number>; start: number; end: number; fadeOutStart: number; fadeOutEnd: number }) => {
-  const opacity = useTransform(progress, [start, end, fadeOutStart, fadeOutEnd], [0, 1, 1, 0]);
-  const y = useTransform(progress, [start, end, fadeOutStart, fadeOutEnd], [20, 0, 0, -20]);
+const SentenceReveal = ({ text, progress, range }: { text: string; progress: MotionValue<number>; range: [number, number] }) => {
+  const fadeOutStart = range[1] - 0.05;
+  const opacity = useTransform(progress, [range[0], range[0] + 0.05, fadeOutStart, range[1]], [0, 1, 1, 0]);
+  const y = useTransform(progress, [range[0], range[0] + 0.05, fadeOutStart, range[1]], [20, 0, 0, -20]);
 
   return (
-    <motion.span style={{ opacity, y, display: "inline-block", marginRight: "0.25em" }}>
-      {word}
+    <motion.span style={{ opacity, y, display: "inline-block" }}>
+      {text}
     </motion.span>
-  );
-};
-
-const WordReveal = ({ text, progress, range }: { text: string; progress: MotionValue<number>; range: [number, number] }) => {
-  const words = text.split(" ");
-  const step = (range[1] - range[0]) / words.length;
-
-  return (
-    <span className="inline-block pointer-events-none">
-      {words.map((word, i) => {
-        const start = range[0] + i * step;
-        const end = start + step;
-        const fadeOutStart = range[1] - 0.05;
-
-        return (
-          <Word 
-            key={i} 
-            word={word} 
-            progress={progress} 
-            start={start} 
-            end={end} 
-            fadeOutStart={fadeOutStart} 
-            fadeOutEnd={range[1]} 
-          />
-        );
-      })}
-    </span>
   );
 };
 
@@ -239,16 +213,16 @@ function ScrollytellingIntro() {
         {/* Text Sequence */}
         <div className="relative z-10 flex h-full w-full max-w-5xl items-center justify-center px-16 text-center pointer-events-none">
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[0]} progress={scrollYProgress} range={[0.1, 0.3]} />
+            <SentenceReveal text={MONOLOGUE[0]} progress={scrollYProgress} range={[0.1, 0.3]} />
           </motion.div>
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[1]} progress={scrollYProgress} range={[0.3, 0.55]} />
+            <SentenceReveal text={MONOLOGUE[1]} progress={scrollYProgress} range={[0.3, 0.55]} />
           </motion.div>
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[2]} progress={scrollYProgress} range={[0.55, 0.8]} />
+            <SentenceReveal text={MONOLOGUE[2]} progress={scrollYProgress} range={[0.55, 0.8]} />
           </motion.div>
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[3]} progress={scrollYProgress} range={[0.8, 1]} />
+            <SentenceReveal text={MONOLOGUE[3]} progress={scrollYProgress} range={[0.8, 1]} />
           </motion.div>
         </div>
 
