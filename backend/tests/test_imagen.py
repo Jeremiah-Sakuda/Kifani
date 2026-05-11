@@ -36,23 +36,22 @@ class TestArchetypeStyles:
 
     def test_style_has_required_fields(self):
         """Test that each style has all required fields."""
-        required_fields = ["body_type", "energy", "colors", "sport_elements"]
+        required_fields = ["energy", "colors", "shapes", "motion"]
 
         for archetype, style in ARCHETYPE_STYLES.items():
             for field in required_fields:
                 assert field in style, f"{archetype} missing {field}"
                 assert len(style[field]) > 0, f"{archetype} has empty {field}"
 
-    def test_adaptive_styles_reference_adaptive_sports(self):
-        """Test that Adaptive archetypes reference Paralympic sports."""
+    def test_adaptive_styles_have_distinct_energy(self):
+        """Test that Adaptive archetypes have unique energy descriptions."""
         adaptive_power = ARCHETYPE_STYLES["Adaptive Power"]
         adaptive_endurance = ARCHETYPE_STYLES["Adaptive Endurance"]
 
-        # Should mention adaptive/Paralympic sports
-        assert "wheelchair" in adaptive_power["sport_elements"].lower() or \
-               "para" in adaptive_power["sport_elements"].lower()
-        assert "wheelchair" in adaptive_endurance["sport_elements"].lower() or \
-               "para" in adaptive_endurance["sport_elements"].lower()
+        # Should have distinct energy descriptions
+        assert adaptive_power["energy"] != adaptive_endurance["energy"]
+        assert "strength" in adaptive_power["energy"].lower() or "power" in adaptive_power["energy"].lower()
+        assert "flow" in adaptive_endurance["energy"].lower() or "persistent" in adaptive_endurance["energy"].lower()
 
     def test_colors_are_distinct(self):
         """Test that each archetype has a distinct color palette."""
@@ -69,15 +68,14 @@ class TestPromptBuilding:
 
     def test_base_prompt_contains_key_instructions(self):
         """Test that base prompt has essential instructions."""
-        assert "non-photorealistic" in BASE_PROMPT.lower()
-        assert "not a photograph" in BASE_PROMPT.lower()
-        assert "stylized" in BASE_PROMPT.lower()
-        assert "artistic" in BASE_PROMPT.lower()
+        assert "abstract" in BASE_PROMPT.lower()
+        assert "geometric" in BASE_PROMPT.lower()
+        assert "no human figures" in BASE_PROMPT.lower()
 
     def test_base_prompt_avoids_real_people(self):
         """Test that base prompt instructs to avoid real people."""
-        assert "real person" in BASE_PROMPT.lower() or \
-               "not photorealistic" in BASE_PROMPT.lower()
+        assert "no human figures" in BASE_PROMPT.lower()
+        assert "absolutely no human figures" in BASE_PROMPT.lower()
 
     def test_build_prompt_includes_archetype_name(self):
         """Test that built prompt includes archetype name."""
@@ -89,7 +87,7 @@ class TestPromptBuilding:
         prompt = _build_prompt("Aerobic Engine")
 
         style = ARCHETYPE_STYLES["Aerobic Engine"]
-        assert style["body_type"] in prompt
+        assert style["shapes"] in prompt
         assert style["colors"] in prompt
 
     def test_build_prompt_fallback_for_unknown_archetype(self):
@@ -98,7 +96,7 @@ class TestPromptBuilding:
 
         # Should use Powerhouse as fallback
         powerhouse_style = ARCHETYPE_STYLES["Powerhouse"]
-        assert powerhouse_style["body_type"] in prompt
+        assert powerhouse_style["shapes"] in prompt
 
 
 class TestImagenResult:
@@ -232,22 +230,23 @@ class TestComplianceRequirements:
     real people or any likeness of actual individuals whatsoever."
     """
 
-    def test_prompt_specifies_non_photorealistic(self):
-        """Verify prompt explicitly requests non-photorealistic output."""
-        assert "non-photorealistic" in BASE_PROMPT.lower()
-        assert "not a photograph" in BASE_PROMPT.lower()
-
-    def test_prompt_avoids_real_faces(self):
-        """Verify prompt instructs to avoid identifiable faces."""
+    def test_prompt_specifies_abstract_only(self):
+        """Verify prompt explicitly requests abstract-only output."""
         prompt_lower = BASE_PROMPT.lower()
-        assert "abstract" in prompt_lower or "silhouette" in prompt_lower
-        assert "no specific face" in prompt_lower or "abstract" in prompt_lower
+        assert "no human figures" in prompt_lower
+        assert "abstract" in prompt_lower
 
-    def test_prompt_requests_stylized_output(self):
-        """Verify prompt requests stylized/artistic rendering."""
+    def test_prompt_avoids_human_likeness(self):
+        """Verify prompt instructs to avoid any human likeness."""
         prompt_lower = BASE_PROMPT.lower()
-        assert "stylized" in prompt_lower
-        assert "artistic" in prompt_lower
+        assert "absolutely no human figures" in prompt_lower
+        assert "no human figures, bodies, faces, or silhouettes" in prompt_lower
+
+    def test_prompt_requests_geometric_output(self):
+        """Verify prompt requests geometric/abstract rendering."""
+        prompt_lower = BASE_PROMPT.lower()
+        assert "geometric" in prompt_lower
+        assert "abstract" in prompt_lower
 
     def test_placeholder_uses_silhouette(self):
         """Verify placeholder SVG uses abstract silhouette."""

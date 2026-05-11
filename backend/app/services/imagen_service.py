@@ -17,80 +17,80 @@ PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
 MODEL_NAME = "gemini-2.5-flash"
 
-# Archetype-specific prompt elements
+# Archetype-specific prompt elements - fully abstract, no human figures
 ARCHETYPE_STYLES: dict[str, dict[str, str]] = {
     "Powerhouse": {
-        "body_type": "powerful, muscular athletic build",
-        "energy": "raw strength and explosive power",
-        "colors": "deep crimson and bronze",
-        "sport_elements": "weightlifting, wrestling, throwing events",
+        "energy": "explosive force radiating outward, heavy and grounded",
+        "colors": "deep crimson, bronze, and molten gold",
+        "shapes": "bold angular blocks, sharp triangles, dense geometric clusters",
+        "motion": "outward explosion, expanding force, seismic waves",
     },
     "Aerobic Engine": {
-        "body_type": "lean, efficient endurance physique",
-        "energy": "flowing movement and sustained power",
-        "colors": "forest green and silver",
-        "sport_elements": "marathon, cycling, cross-country skiing",
+        "energy": "continuous flowing rhythm, perpetual motion",
+        "colors": "forest green, silver, and cool blue",
+        "shapes": "long flowing curves, continuous ribbons, spiral patterns",
+        "motion": "endless forward flow, rhythmic waves, sustained momentum",
     },
     "Precision Athlete": {
-        "body_type": "balanced, controlled athletic form",
-        "energy": "focused concentration and steady hands",
-        "colors": "deep blue and white",
-        "sport_elements": "archery, shooting, fencing",
+        "energy": "focused stillness, pinpoint concentration",
+        "colors": "deep navy blue, white, and steel gray",
+        "shapes": "precise circles, perfect lines, crosshair patterns, targets",
+        "motion": "converging lines to a single point, crystalline structure",
     },
     "Explosive Mover": {
-        "body_type": "dynamic, spring-loaded athletic build",
-        "energy": "explosive speed and quick reactions",
-        "colors": "bright orange and gold",
-        "sport_elements": "sprinting, jumping, gymnastics",
+        "energy": "lightning-fast bursts, spring-loaded tension release",
+        "colors": "bright orange, electric gold, and hot yellow",
+        "shapes": "sharp zigzags, starburst patterns, angular fragments",
+        "motion": "sudden acceleration, spark explosions, rapid trajectories",
     },
     "Coordinated Specialist": {
-        "body_type": "agile, flexible athletic form",
-        "energy": "grace and precise coordination",
-        "colors": "royal purple and silver",
-        "sport_elements": "gymnastics, diving, figure skating",
+        "energy": "graceful balance, harmonious flow",
+        "colors": "royal purple, silver, and soft violet",
+        "shapes": "elegant spirals, interlocking curves, balanced symmetry",
+        "motion": "fluid rotations, graceful arcs, pendulum swings",
     },
     "Tactical Endurance": {
-        "body_type": "versatile, balanced athletic build",
-        "energy": "strategic patience and sustained effort",
-        "colors": "steel gray and deep blue",
-        "sport_elements": "rowing, swimming, triathlon",
+        "energy": "strategic patience, sustained intensity",
+        "colors": "steel gray, deep blue, and titanium",
+        "shapes": "layered waves, strategic grid patterns, interconnected nodes",
+        "motion": "steady progression, building momentum, wave after wave",
     },
     "Adaptive Power": {
-        "body_type": "powerful adaptive athletic build",
-        "energy": "determined strength and resilience",
-        "colors": "bronze and deep amber",
-        "sport_elements": "Paralympic powerlifting, wheelchair rugby, shot put",
+        "energy": "resilient strength, transformative force",
+        "colors": "bronze, deep amber, and burnished copper",
+        "shapes": "interlocking geometric forms, adaptive tessellations",
+        "motion": "transformation, shape-shifting energy, breakthrough moments",
     },
     "Adaptive Endurance": {
-        "body_type": "efficient adaptive athletic form",
-        "energy": "persistent flow and determination",
-        "colors": "teal and aquamarine",
-        "sport_elements": "Paralympic cycling, wheelchair racing, para-swimming",
+        "energy": "persistent flow, unstoppable determination",
+        "colors": "teal, aquamarine, and ocean blue",
+        "shapes": "flowing water patterns, adaptive curves, morphing streams",
+        "motion": "continuous adaptation, flowing around obstacles, relentless forward motion",
     },
 }
 
-# Base prompt template
-BASE_PROMPT = """Create a stylized, artistic portrait representing the {archetype} athletic archetype.
+# Base prompt template - purely abstract, no human figures
+BASE_PROMPT = """Create an abstract geometric artwork representing the essence of "{archetype}" energy.
 
-Style: Non-photorealistic digital art, inspired by Team USA poster art and athletic iconography.
-NOT a photograph of a real person. Abstract and symbolic representation.
+Style: Modern abstract digital art. Bold geometric shapes and dynamic patterns.
+NO human figures, faces, bodies, or silhouettes. Purely abstract shapes and energy.
 
-The figure should embody:
-- Body type: {body_type}
-- Energy/movement: {energy}
-- Color palette: {colors}, with golden accents
-- Sport imagery: subtle hints of {sport_elements}
+Visual elements:
+- Energy feeling: {energy}
+- Color palette: {colors}
+- Shape language: {shapes}
+- Motion/flow: {motion}
 
 Composition:
-- Single heroic figure in dynamic pose
-- Abstract geometric background suggesting motion
-- Dramatic lighting with {colors} tones
-- Modern athletic poster aesthetic with bold geometry
+- Dynamic abstract composition with depth and movement
+- Dramatic lighting and color gradients
+- Modern poster aesthetic with bold geometry
+- Sense of power and athleticism through abstract forms only
 
-Important:
-- Must be clearly artistic/stylized, NOT photorealistic
-- No specific face features - abstract or silhouette
-- Emphasize athletic movement and form
+Critical requirements:
+- ABSOLUTELY NO human figures, bodies, faces, or silhouettes
+- ONLY geometric shapes, patterns, lines, and abstract forms
+- Think: abstract expressionism meets sports energy
 - Professional, inspiring, suitable for all audiences
 """
 
@@ -120,10 +120,10 @@ def _build_prompt(archetype: str) -> str:
 
     return BASE_PROMPT.format(
         archetype=archetype,
-        body_type=style["body_type"],
         energy=style["energy"],
         colors=style["colors"],
-        sport_elements=style["sport_elements"],
+        shapes=style["shapes"],
+        motion=style["motion"],
     )
 
 
@@ -145,14 +145,13 @@ async def generate_portrait(
         client = _get_client()
         prompt = _build_prompt(archetype)
 
-        # Generate image using Imagen
+        # Generate image using Imagen - pure abstract art, no human figures in prompt
         response = client.models.generate_images(
             model="imagen-3.0-fast-generate-001",
             prompt=prompt,
             config=types.GenerateImagesConfig(
                 number_of_images=1,
                 output_mime_type="image/jpeg",
-                person_generation="DONT_ALLOW",
             ),
         )
 
