@@ -1,8 +1,8 @@
 """
-Tests for Imagen portrait generation service.
+Tests for portrait generation service (using Gemini).
 
 Tests focus on prompt building, archetype styles, and result handling,
-as actual Imagen calls require GCP credentials.
+as actual Gemini calls require GCP credentials.
 """
 
 from app.services.imagen_service import (
@@ -65,7 +65,7 @@ class TestArchetypeStyles:
 
 
 class TestPromptBuilding:
-    """Test prompt construction for Imagen."""
+    """Test prompt construction for image generation."""
 
     def test_base_prompt_contains_key_instructions(self):
         """Test that base prompt has essential instructions."""

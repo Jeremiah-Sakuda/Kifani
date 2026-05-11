@@ -1,7 +1,7 @@
 """
-FORGED — Imagen Portrait Generation Service
+FORGED — Portrait Generation Service
 
-Uses Imagen 4 to generate stylized archetype portraits.
+Uses Gemini 2.0 Flash to generate stylized archetype portraits.
 Non-photorealistic, artistic representations of athletic archetypes.
 """
 
@@ -10,12 +10,12 @@ import base64
 from dataclasses import dataclass
 from typing import Any
 
-from google.cloud import aiplatform
-from vertexai.preview.vision_models import ImageGenerationModel
+from google import genai
+from google.genai import types
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "imagen-3.0-generate-002"  # Imagen 3 (latest available)
+MODEL_NAME = "gemini-2.0-flash-preview-image-generation"
 
 # Archetype-specific prompt elements
 ARCHETYPE_STYLES: dict[str, dict[str, str]] = {
@@ -97,7 +97,7 @@ Important:
 
 @dataclass
 class ImagenResult:
-    """Result from Imagen generation."""
+    """Result from image generation."""
     success: bool
     image_base64: str | None = None
     mime_type: str = "image/png"
@@ -105,10 +105,13 @@ class ImagenResult:
     error: str | None = None
 
 
-def _get_model() -> ImageGenerationModel:
-    """Initialize Imagen model."""
-    aiplatform.init(project=PROJECT_ID, location=LOCATION)
-    return ImageGenerationModel.from_pretrained(MODEL_NAME)
+def _get_client() -> genai.Client:
+    """Initialize Gemini client for Vertex AI."""
+    return genai.Client(
+        vertexai=True,
+        project=PROJECT_ID,
+        location=LOCATION,
+    )
 
 
 def _build_prompt(archetype: str) -> str:
@@ -129,7 +132,7 @@ async def generate_portrait(
     session_id: str | None = None,
 ) -> ImagenResult:
     """
-    Generate a stylized archetype portrait using Imagen.
+    Generate a stylized archetype portrait using Gemini.
 
     Args:
         archetype: Name of the archetype
@@ -139,44 +142,48 @@ async def generate_portrait(
         ImagenResult with base64-encoded image
     """
     try:
-        model = _get_model()
+        client = _get_client()
         prompt = _build_prompt(archetype)
 
-        # Generate image
-        response = model.generate_images(
-            prompt=prompt,
-            number_of_images=1,
-            aspect_ratio="3:4",  # Portrait orientation
-            safety_filter_level="block_some",
-            person_generation="dont_allow",  # No photorealistic people
+        # Generate image using Gemini
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                response_modalities=["IMAGE"],
+            ),
         )
 
-        if not response.images:
+        # Extract image from response
+        if not response.candidates or not response.candidates[0].content.parts:
             return ImagenResult(
                 success=False,
                 error="No images generated",
                 prompt_used=prompt,
             )
 
-        # Get the first image
-        image = response.images[0]
-
-        # Convert to base64
-        image_bytes = image._image_bytes
-        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        # Find the image part in the response
+        for part in response.candidates[0].content.parts:
+            if part.inline_data and part.inline_data.mime_type.startswith("image/"):
+                image_base64 = base64.b64encode(part.inline_data.data).decode("utf-8")
+                return ImagenResult(
+                    success=True,
+                    image_base64=image_base64,
+                    mime_type=part.inline_data.mime_type,
+                    prompt_used=prompt,
+                )
 
         return ImagenResult(
-            success=True,
-            image_base64=image_base64,
-            mime_type="image/png",
+            success=False,
+            error="No image found in response",
             prompt_used=prompt,
         )
 
     except Exception as e:
         import traceback
         error_details = f"{type(e).__name__}: {str(e)}"
-        print(f"[IMAGEN ERROR] {error_details}")
-        print(f"[IMAGEN TRACEBACK] {traceback.format_exc()}")
+        print(f"[GEMINI IMAGE ERROR] {error_details}")
+        print(f"[GEMINI IMAGE TRACEBACK] {traceback.format_exc()}")
         return ImagenResult(
             success=False,
             error=error_details,
