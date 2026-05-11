@@ -174,7 +174,7 @@
    - Real-time relevance
 
 2. **Thinking Traces** (`825fb6c`, `bd2c771`)
-   - Gemini 3.1 Pro reasoning streamed live
+   - Gemini 2.5 Pro reasoning streamed live
    - Users see HOW the agent decides
    - SSE event type: "reasoning"
 
@@ -278,7 +278,7 @@
 - 8 archetypes with biometric centroids
 
 ### Google Cloud Services Used
-- Vertex AI (Gemini 3.1 Pro, Gemini 3.1 Flash, Imagen 3.0)
+- Vertex AI (Gemini 2.5 Pro, Gemini 2.5 Flash, Imagen 3.0)
 - Vertex AI Embeddings (text-embedding-005)
 - Vertex AI Context Caching
 - Google Search Grounding

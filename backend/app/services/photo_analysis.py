@@ -15,7 +15,7 @@ from vertexai.generative_models import GenerativeModel, Part, Image
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "gemini-3.1-flash"
+MODEL_NAME = "gemini-2.5-flash"
 
 # Extraction prompt for body proportion analysis
 EXTRACTION_PROMPT = """Analyze this full-body photo and estimate the person's physical proportions.

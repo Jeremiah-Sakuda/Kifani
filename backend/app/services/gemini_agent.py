@@ -23,7 +23,7 @@ from app.services.bigquery_service import (
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "gemini-3.1-pro"
+MODEL_NAME = "gemini-2.5-pro"
 
 
 def _get_model() -> GenerativeModel:

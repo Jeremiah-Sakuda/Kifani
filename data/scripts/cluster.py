@@ -47,7 +47,7 @@ def get_sport_biometric_distributions() -> list[dict]:
 def run_gemini_clustering(distributions: list[dict]) -> list[dict]:
     """Use Gemini to analyze distributions and define/refine archetypes."""
     aiplatform.init(project=PROJECT_ID, location=LOCATION)
-    model = GenerativeModel("gemini-3.1-pro")
+    model = GenerativeModel("gemini-2.5-pro")
 
     prompt = f"""Analyze these Team USA athlete biometric distributions by sport and define 5-7 body-type-driven archetypes.
 

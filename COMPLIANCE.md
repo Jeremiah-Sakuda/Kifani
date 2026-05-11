@@ -105,7 +105,7 @@ grep -rn "rings\|torch\|agitos\|olympic logo" backend/ frontend/ public/
 **Rule:** All athlete comparisons must use hedged, conditional phrasing.
 
 **Implementation:**
-- Dedicated validation layer using Gemini 3.1 Flash
+- Dedicated validation layer using Gemini 2.5 Flash
 - All narratives pass through `conditional_validator.py` before display
 - Definitive phrases automatically rewritten:
   - "you would be good at" → "could align with"
