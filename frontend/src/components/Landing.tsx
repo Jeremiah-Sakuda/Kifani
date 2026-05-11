@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import InputModeSelector from "./InputModeSelector";
@@ -16,11 +16,59 @@ const DEMO_PROFILES = [
   { name: "Runner Build", height_cm: 178, weight_kg: 62 },
 ];
 
+const MONOLOGUE = [
+  "For 120 years, they forged history.",
+  "Thousands of athletes. Infinite variations of the human form.",
+  "But every fan carries a body built for something.",
+  "It's time to discover what you were built for.",
+];
+
 export default function Landing() {
   const navigate = useNavigate();
   const [inputMode, setInputMode] = useState<InputMode>("form");
   const [prefillData, setPrefillData] = useState<PrefillData | undefined>();
   const [showDemoOptions, setShowDemoOptions] = useState(false);
+
+  // Cinematic Intro State
+  const [showIntro, setShowIntro] = useState(true);
+  const [introStarted, setIntroStarted] = useState(false);
+  const [introStep, setIntroStep] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    // In deployment, we would uncomment this to only show on first visit.
+    // For testing, we play it every time.
+    /*
+    const hasSeenIntro = localStorage.getItem("hasSeenIntro");
+    if (hasSeenIntro) {
+      setShowIntro(false);
+    }
+    */
+  }, []);
+
+  const startIntro = () => {
+    setIntroStarted(true);
+    const audio = new Audio("/intro.mp3");
+    audioRef.current = audio;
+    audio.play().catch(console.error);
+
+    // Timing synced roughly to the AriaNeural TTS pacing
+    setTimeout(() => setIntroStep(1), 3500);
+    setTimeout(() => setIntroStep(2), 8500);
+    setTimeout(() => setIntroStep(3), 13500);
+    setTimeout(() => {
+      setShowIntro(false);
+      localStorage.setItem("hasSeenIntro", "true");
+    }, 18000);
+  };
+
+  const skipIntro = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+    }
+    setShowIntro(false);
+    localStorage.setItem("hasSeenIntro", "true");
+  };
 
   const handleFallbackToForm = (data?: PrefillData) => {
     setPrefillData(data);
@@ -39,8 +87,72 @@ export default function Landing() {
     });
   };
 
+  // Render Cinematic Intro
+  if (showIntro) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-forge-black">
+        {/* Soft pulsing background glow */}
+        <motion.div
+          animate={{ scale: [1, 1.05, 1], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,_var(--color-gold-core)_0%,_transparent_60%)] mix-blend-screen opacity-20 blur-[100px]"
+        />
+
+        {!introStarted ? (
+          <motion.button
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1 }}
+            onClick={startIntro}
+            className="group relative z-10 flex items-center gap-4 rounded-full border border-gold-core/30 bg-gold-core/5 px-10 py-5 text-sm tracking-[0.2em] uppercase text-gold-core backdrop-blur-md transition-all hover:bg-gold-core/20 hover:shadow-[0_0_30px_rgba(212,160,18,0.3)]"
+          >
+            Begin Experience
+            <svg className="h-5 w-5 transition-transform duration-500 group-hover:translate-x-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </motion.button>
+        ) : (
+          <>
+            <div className="relative z-10 w-full max-w-5xl px-8 text-center">
+              <AnimatePresence mode="wait">
+                {introStep < MONOLOGUE.length && (
+                  <motion.p
+                    key={introStep}
+                    initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    exit={{ opacity: 0, y: -20, filter: "blur(10px)" }}
+                    transition={{ duration: 1.2, ease: "easeInOut" }}
+                    className="font-display text-4xl leading-tight text-white md:text-6xl lg:text-7xl drop-shadow-2xl"
+                  >
+                    {MONOLOGUE[introStep]}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <motion.button
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 2 }}
+              onClick={skipIntro}
+              className="absolute bottom-12 right-12 z-20 text-xs tracking-widest uppercase text-smoke transition hover:text-white"
+            >
+              Skip Intro
+            </motion.button>
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Render Main Page
   return (
-    <div className="relative min-h-screen overflow-hidden bg-forge-black">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5, ease: "easeOut" }}
+      className="relative min-h-screen overflow-hidden bg-forge-black"
+    >
       {/* Background Effects */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <motion.div
@@ -63,7 +175,7 @@ export default function Landing() {
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 1, ease: "easeOut" }}
             className="lg:sticky lg:top-24"
           >
             {/* Badge */}
@@ -148,7 +260,7 @@ export default function Landing() {
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            transition={{ duration: 1, delay: 0.3, ease: "easeOut" }}
             className="relative"
           >
             {/* Soft backdrop glow behind form */}
@@ -314,6 +426,6 @@ export default function Landing() {
       <div className="relative z-10 border-t border-white/5 bg-forge-black py-20">
         <ArchetypePreview />
       </div>
-    </div>
+    </motion.div>
   );
 }
