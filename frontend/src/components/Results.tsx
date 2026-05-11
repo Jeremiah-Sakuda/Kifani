@@ -313,7 +313,7 @@ export default function Results() {
           {/* Description */}
           <motion.p
             variants={fadeUp}
-            className="mx-auto max-w-2xl text-lg leading-relaxed text-silver"
+            className="mx-auto w-full max-w-2xl text-lg leading-relaxed text-silver"
           >
             {result.primary_archetype.description}
           </motion.p>

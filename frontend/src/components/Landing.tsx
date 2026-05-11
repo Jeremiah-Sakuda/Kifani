@@ -40,37 +40,57 @@ export default function Landing() {
   };
 
   return (
-    <div className="min-h-screen bg-forge-black">
+    <div className="relative min-h-screen overflow-hidden bg-forge-black">
+      {/* Background Effects */}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <motion.div
+          animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.15, 0.08] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -left-1/4 -top-1/4 h-[800px] w-[800px] rounded-full bg-gold-core/20 mix-blend-screen blur-[120px]"
+        />
+        <motion.div
+          animate={{ scale: [1, 1.1, 1], opacity: [0.05, 0.1, 0.05] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          className="absolute -bottom-1/4 -right-1/4 h-[600px] w-[600px] rounded-full bg-ember-glow/20 mix-blend-screen blur-[100px]"
+        />
+      </div>
+
       {/* Hero + Form Section */}
-      <div className="w-full px-6 py-16 md:px-12 lg:px-20 lg:py-24">
-        <div className="mx-auto grid max-w-7xl gap-16 lg:grid-cols-2 lg:items-start lg:gap-20">
+      <div className="relative z-10 w-full px-6 py-16 md:px-12 lg:px-20 lg:py-24">
+        <div className="mx-auto grid max-w-7xl gap-16 lg:grid-cols-2 lg:items-center lg:gap-20">
 
           {/* Left: Hero Content */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             className="lg:sticky lg:top-24"
           >
             {/* Badge */}
-            <div className="mb-6 flex items-center gap-3">
-              <div className="h-px w-10 bg-gold-core/50" />
-              <span className="font-mono text-xs uppercase tracking-widest text-gold-core">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="mb-8 flex items-center gap-4"
+            >
+              <div className="h-px w-12 bg-gradient-to-r from-gold-core/0 to-gold-core/80" />
+              <span className="font-mono text-xs uppercase tracking-[0.2em] text-gold-core drop-shadow-md">
                 120 Years of Team USA
               </span>
-            </div>
+              <div className="h-px w-12 bg-gradient-to-l from-gold-core/0 to-gold-core/80" />
+            </motion.div>
 
             {/* Title */}
-            <h1 className="mb-6 font-display text-6xl text-white md:text-7xl xl:text-8xl">
-              FORGED
+            <h1 className="mb-6 font-display text-7xl text-white md:text-8xl xl:text-9xl drop-shadow-2xl">
+              <span className="bg-gradient-to-br from-white via-platinum to-silver bg-clip-text text-transparent">FORGED</span>
             </h1>
 
             {/* Subtitle */}
-            <p className="mb-4 font-display text-xl italic text-silver md:text-2xl">
-              See yourself in 120 years of Olympic & Paralympic history
+            <p className="mb-6 font-display text-2xl italic text-silver md:text-3xl lg:text-4xl">
+              See yourself in Olympic history
             </p>
 
-            <p className="mb-8 max-w-md text-base leading-relaxed text-smoke">
+            <p className="mb-10 w-full max-w-lg text-lg leading-relaxed text-smoke shadow-black drop-shadow-md">
               Every fan carries a body with history. Discover which Team USA
               athletes share your build — powered by Gemini.
             </p>
@@ -79,14 +99,16 @@ export default function Landing() {
             <div className="hidden lg:block">
               <button
                 onClick={() => setShowDemoOptions(!showDemoOptions)}
-                className="flex items-center gap-2 text-sm text-ash transition hover:text-gold-core"
+                className="group flex items-center gap-3 rounded-full bg-forge-steel/40 px-5 py-2.5 text-sm font-medium text-silver backdrop-blur-sm transition-all hover:bg-gold-core/20 hover:text-gold-core border border-white/5"
               >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-                </svg>
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 group-hover:bg-gold-core/20">
+                  <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
                 Quick demo profiles
                 <svg
-                  className={`h-3 w-3 transition-transform ${showDemoOptions ? "rotate-180" : ""}`}
+                  className={`ml-2 h-4 w-4 transition-transform duration-300 ${showDemoOptions ? "rotate-180" : ""}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -96,76 +118,97 @@ export default function Landing() {
                 </svg>
               </button>
 
-              {showDemoOptions && (
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {DEMO_PROFILES.map((profile) => (
-                    <button
-                      key={profile.name}
-                      onClick={() => handleDemo(profile)}
-                      className="rounded-lg bg-forge-steel px-3 py-2 text-sm text-smoke transition hover:bg-forge-iron hover:text-white"
-                    >
-                      {profile.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <AnimatePresence>
+                {showDemoOptions && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0, y: -10 }}
+                    animate={{ opacity: 1, height: "auto", y: 0 }}
+                    exit={{ opacity: 0, height: 0, y: -10 }}
+                    className="mt-4 flex flex-wrap gap-3 overflow-hidden"
+                  >
+                    {DEMO_PROFILES.map((profile, i) => (
+                      <motion.button
+                        key={profile.name}
+                        initial={{ opacity: 0, x: -10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                        onClick={() => handleDemo(profile)}
+                        className="rounded-xl border border-white/10 bg-forge-steel/60 px-4 py-2.5 text-sm text-smoke backdrop-blur-md transition hover:border-gold-core/50 hover:bg-gold-core/10 hover:text-white hover:shadow-[0_0_15px_rgba(212,160,18,0.2)]"
+                      >
+                        {profile.name}
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
 
           {/* Right: Input Form */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            initial={{ opacity: 0, x: 30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            className="relative"
           >
-            {/* Input Mode Selector */}
-            <div className="mb-6">
-              <InputModeSelector activeMode={inputMode} onModeChange={setInputMode} />
+            {/* Soft backdrop glow behind form */}
+            <div className="absolute inset-0 -z-10 bg-gradient-to-br from-gold-core/10 via-transparent to-ember-glow/10 blur-[80px]" />
+            
+            <div className="rounded-3xl border border-white/5 bg-forge-charcoal/40 p-1 shadow-2xl backdrop-blur-xl">
+              {/* Input Mode Selector */}
+              <div className="mb-4">
+                <InputModeSelector activeMode={inputMode} onModeChange={setInputMode} />
+              </div>
+
+              {/* Forms */}
+              <div className="min-h-[500px]">
+                <AnimatePresence mode="wait">
+                  {inputMode === "photo" && (
+                    <motion.div
+                      key="photo"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <PhotoInput onFallback={handleFallbackToForm} />
+                    </motion.div>
+                  )}
+                  {inputMode === "voice" && (
+                    <motion.div
+                      key="voice"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <VoiceInput onFallback={handleFallbackToForm} />
+                    </motion.div>
+                  )}
+                  {inputMode === "form" && (
+                    <motion.div
+                      key="form"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <FormInput prefillData={prefillData} />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </div>
 
-            {/* Forms */}
-            <AnimatePresence mode="wait">
-              {inputMode === "photo" && (
-                <motion.div
-                  key="photo"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <PhotoInput onFallback={handleFallbackToForm} />
-                </motion.div>
-              )}
-              {inputMode === "voice" && (
-                <motion.div
-                  key="voice"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <VoiceInput onFallback={handleFallbackToForm} />
-                </motion.div>
-              )}
-              {inputMode === "form" && (
-                <motion.div
-                  key="form"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <FormInput prefillData={prefillData} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             {/* Demo Profiles - Mobile */}
-            <div className="mt-8 text-center lg:hidden">
+            <div className="mt-10 text-center lg:hidden">
               <button
                 onClick={() => setShowDemoOptions(!showDemoOptions)}
-                className="inline-flex items-center gap-2 text-sm text-ash transition hover:text-gold-core"
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-forge-steel/50 px-6 py-3 text-sm text-silver backdrop-blur-sm transition hover:bg-gold-core/20 hover:text-gold-core"
               >
                 Quick demo profiles
                 <svg
-                  className={`h-3 w-3 transition-transform ${showDemoOptions ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 transition-transform duration-300 ${showDemoOptions ? "rotate-180" : ""}`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -175,81 +218,100 @@ export default function Landing() {
                 </svg>
               </button>
 
-              {showDemoOptions && (
-                <div className="mt-3 flex flex-wrap justify-center gap-2">
-                  {DEMO_PROFILES.map((profile) => (
-                    <button
-                      key={profile.name}
-                      onClick={() => handleDemo(profile)}
-                      className="rounded-lg bg-forge-steel px-3 py-2 text-sm text-smoke transition hover:bg-forge-iron hover:text-white"
-                    >
-                      {profile.name}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <AnimatePresence>
+                {showDemoOptions && (
+                  <motion.div 
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="mt-4 flex flex-wrap justify-center gap-3 overflow-hidden"
+                  >
+                    {DEMO_PROFILES.map((profile) => (
+                      <button
+                        key={profile.name}
+                        onClick={() => handleDemo(profile)}
+                        className="rounded-xl border border-white/5 bg-forge-charcoal/80 px-4 py-2.5 text-sm text-smoke backdrop-blur-sm transition hover:border-gold-core/50 hover:bg-gold-core/10 hover:text-white"
+                      >
+                        {profile.name}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         </div>
       </div>
 
       {/* Feature CTAs */}
-      <div className="border-t border-forge-graphite/30 py-12">
-        <div className="mx-auto grid max-w-7xl gap-6 px-6 md:grid-cols-2 md:px-12 lg:px-20">
+      <div className="relative z-10 mt-12 border-t border-white/5 bg-forge-charcoal/30 py-20 backdrop-blur-xl">
+        <div className="mx-auto grid max-w-7xl gap-8 px-6 md:grid-cols-2 md:px-12 lg:gap-12 lg:px-20">
           {/* Paralympic Spotlight CTA */}
-          <div className="rounded-xl border border-amber-500/30 bg-amber-950/10 p-6">
-            <div className="flex items-center gap-2">
-              <div className="h-px w-8 bg-amber-500/50" />
-              <span className="font-mono text-xs uppercase tracking-widest text-amber-500">
-                Paralympic Spotlight
-              </span>
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="group relative overflow-hidden rounded-2xl border border-white/5 bg-forge-black/50 p-8 transition-colors hover:border-amber-500/30 hover:bg-amber-950/20"
+          >
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-amber-500/10 blur-[50px] transition-all group-hover:bg-amber-500/20" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-amber-500/60" />
+                <span className="font-mono text-xs uppercase tracking-[0.2em] text-amber-500">
+                  Paralympic Spotlight
+                </span>
+              </div>
+              <h2 className="mt-4 font-display text-3xl text-white transition-colors group-hover:text-amber-50">
+                Explore by Classification
+              </h2>
+              <p className="mt-3 w-full text-base text-smoke">
+                Most tools treat Paralympic athletes as a footnote. We built two ways in, putting adaptive sports at the forefront.
+              </p>
+              <Link
+                to="/paralympic"
+                className="mt-8 inline-flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-6 py-3 text-sm font-medium text-amber-400 transition hover:bg-amber-500/20 hover:text-amber-300"
+              >
+                Explore Paralympics
+                <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
             </div>
-            <h2 className="mt-3 font-display text-2xl text-white">
-              Explore by Classification
-            </h2>
-            <p className="mt-2 text-sm text-smoke">
-              Most tools treat Paralympic athletes as a footnote. We built two ways in.
-            </p>
-            <Link
-              to="/paralympic"
-              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-amber-500/50 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-400 transition hover:bg-amber-500/20"
-            >
-              Explore Paralympics
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </Link>
-          </div>
+          </motion.div>
 
           {/* Era Time Machine CTA */}
-          <div className="rounded-xl border border-gold-core/30 bg-gold-core/5 p-6">
-            <div className="flex items-center gap-2">
-              <div className="h-px w-8 bg-gold-core/50" />
-              <span className="font-mono text-xs uppercase tracking-widest text-gold-core">
-                Era Time Machine
-              </span>
+          <motion.div 
+            whileHover={{ y: -5 }}
+            className="group relative overflow-hidden rounded-2xl border border-white/5 bg-forge-black/50 p-8 transition-colors hover:border-gold-core/30 hover:bg-gold-core/10"
+          >
+            <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-gold-core/10 blur-[50px] transition-all group-hover:bg-gold-core/20" />
+            <div className="relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="h-px w-8 bg-gold-core/60" />
+                <span className="font-mono text-xs uppercase tracking-[0.2em] text-gold-core">
+                  Era Time Machine
+                </span>
+              </div>
+              <h2 className="mt-4 font-display text-3xl text-white transition-colors group-hover:text-gold-white">
+                120 Years of Evolution
+              </h2>
+              <p className="mt-3 w-full text-base text-smoke">
+                See how archetypes have evolved from the Pioneer Era (pre-1950) to today's highly specialized competitors.
+              </p>
+              <Link
+                to="/era"
+                className="mt-8 inline-flex items-center gap-3 rounded-xl border border-gold-core/30 bg-gold-core/10 px-6 py-3 text-sm font-medium text-gold-core transition hover:bg-gold-core/20 hover:text-gold-bright"
+              >
+                Explore Timeline
+                <svg className="h-4 w-4 transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+              </Link>
             </div>
-            <h2 className="mt-3 font-display text-2xl text-white">
-              120 Years of Evolution
-            </h2>
-            <p className="mt-2 text-sm text-smoke">
-              See how archetypes have evolved from Pioneer Era (pre-1950) to today.
-            </p>
-            <Link
-              to="/era"
-              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-gold-core/50 bg-gold-core/10 px-4 py-2 text-sm font-medium text-gold-core transition hover:bg-gold-core/20"
-            >
-              Explore Timeline
-              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </Link>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* Archetype Carousel Section */}
-      <div className="border-t border-forge-graphite/30 py-16">
+      <div className="relative z-10 border-t border-white/5 bg-forge-black py-20">
         <ArchetypePreview />
       </div>
     </div>

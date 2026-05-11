@@ -136,7 +136,7 @@ export default function ConfidenceMeter({ confidence, showExplanation = true }: 
           transition={{ delay: 1.5, duration: 0.4 }}
           className="mt-4 rounded-lg bg-forge-steel/40 p-3"
         >
-          <p className="!max-w-none text-sm leading-relaxed text-smoke">
+          <p className="w-full !max-w-none text-sm leading-relaxed text-smoke">
             {levelInfo.description}
           </p>
         </motion.div>
