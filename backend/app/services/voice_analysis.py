@@ -106,19 +106,13 @@ async def analyze_voice(audio_data: bytes, mime_type: str = "audio/webm") -> Voi
             generation_config={
                 "temperature": 0.1,
                 "max_output_tokens": 1024,
+                "response_mime_type": "application/json",
             }
         )
 
         # Parse JSON response
         import json
         text = response.text.strip()
-
-        # Handle markdown code blocks
-        if text.startswith("```"):
-            text = text.split("```")[1]
-            if text.startswith("json"):
-                text = text[4:]
-            text = text.strip()
 
         data = json.loads(text)
 
