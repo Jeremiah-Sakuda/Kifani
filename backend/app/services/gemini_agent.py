@@ -147,19 +147,20 @@ async def handle_chat_message(
     session_context: dict,
 ) -> str:
     """Handle a conversational follow-up with function calling."""
-    model = _get_model()
-
-    # Build conversation history
-    history = []
+    # Build context string to prepend to system instruction
     archetype_context = json.dumps(session_context.get("archetype_result", {}), default=str)
+    context_string = f"User matched archetype data: {archetype_context}"
+    
+    aiplatform.init(project=PROJECT_ID, location=LOCATION)
+    model = GenerativeModel(
+        MODEL_NAME,
+        system_instruction=f"{SYSTEM_PROMPT}\n\nCurrent context: {context_string}",
+    )
 
-    history.append({
-        "role": "user",
-        "parts": [f"[Context: User matched archetype data: {archetype_context}]"],
-    })
-
+    history = []
     for msg in session_context.get("messages", []):
-        history.append({"role": msg["role"], "parts": [msg["content"]]})
+        role = "model" if msg["role"] == "assistant" else msg["role"]
+        history.append({"role": role, "parts": [msg["content"]]})
 
     chat = model.start_chat(history=history)
     response = chat.send_message(message, tools=[_bq_tools])
