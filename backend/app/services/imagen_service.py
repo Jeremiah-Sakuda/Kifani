@@ -145,37 +145,33 @@ async def generate_portrait(
         client = _get_client()
         prompt = _build_prompt(archetype)
 
-        # Generate image using Gemini
-        response = client.models.generate_content(
-            model=MODEL_NAME,
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                response_modalities=["IMAGE"],
+        # Generate image using Imagen
+        response = client.models.generate_images(
+            model="imagen-3.0-generate-001",
+            prompt=prompt,
+            config=types.GenerateImagesConfig(
+                number_of_images=1,
+                output_mime_type="image/jpeg",
+                person_generation="DONT_ALLOW",
             ),
         )
 
         # Extract image from response
-        if not response.candidates or not response.candidates[0].content.parts:
+        if not response.generated_images:
             return ImagenResult(
                 success=False,
                 error="No images generated",
                 prompt_used=prompt,
             )
 
-        # Find the image part in the response
-        for part in response.candidates[0].content.parts:
-            if part.inline_data and part.inline_data.mime_type.startswith("image/"):
-                image_base64 = base64.b64encode(part.inline_data.data).decode("utf-8")
-                return ImagenResult(
-                    success=True,
-                    image_base64=image_base64,
-                    mime_type=part.inline_data.mime_type,
-                    prompt_used=prompt,
-                )
-
+        # Base64 encode the returned image bytes
+        image_bytes = response.generated_images[0].image.image_bytes
+        image_base64 = base64.b64encode(image_bytes).decode("utf-8")
+        
         return ImagenResult(
-            success=False,
-            error="No image found in response",
+            success=True,
+            image_base64=image_base64,
+            mime_type="image/jpeg",
             prompt_used=prompt,
         )
 
