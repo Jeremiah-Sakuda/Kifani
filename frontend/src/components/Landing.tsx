@@ -214,19 +214,41 @@ function ScrollytellingIntro() {
           {isMuted ? "Sound Off" : "Sound On"}
         </button>
 
+        {/* Title Screen (Fades out quickly on scroll) */}
+        <motion.div 
+          style={{ opacity: useTransform(scrollYProgress, [0, 0.05], [1, 0]) }}
+          className="absolute inset-0 flex flex-col items-center justify-center z-10 pointer-events-none"
+        >
+          <h1 className="font-display text-8xl md:text-9xl tracking-widest text-white drop-shadow-2xl mb-8">
+            <span className="bg-gradient-to-br from-white via-platinum to-silver bg-clip-text text-transparent">
+              FORGED
+            </span>
+          </h1>
+          <motion.div 
+            animate={{ y: [0, 10, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="flex flex-col items-center text-smoke/70 mt-8"
+          >
+            <span className="text-sm tracking-widest uppercase mb-4">Scroll to discover</span>
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </motion.div>
+        </motion.div>
+
         {/* Text Sequence */}
         <div className="relative z-10 flex h-full w-full max-w-5xl items-center justify-center px-16 text-center pointer-events-none">
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[0]} progress={scrollYProgress} range={[0, 0.25]} />
+            <WordReveal text={MONOLOGUE[0]} progress={scrollYProgress} range={[0.1, 0.3]} />
           </motion.div>
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[1]} progress={scrollYProgress} range={[0.25, 0.5]} />
+            <WordReveal text={MONOLOGUE[1]} progress={scrollYProgress} range={[0.3, 0.55]} />
           </motion.div>
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[2]} progress={scrollYProgress} range={[0.5, 0.75]} />
+            <WordReveal text={MONOLOGUE[2]} progress={scrollYProgress} range={[0.55, 0.8]} />
           </motion.div>
           <motion.div className="absolute font-display text-4xl leading-tight text-white drop-shadow-2xl md:text-6xl lg:text-7xl">
-            <WordReveal text={MONOLOGUE[3]} progress={scrollYProgress} range={[0.75, 1]} />
+            <WordReveal text={MONOLOGUE[3]} progress={scrollYProgress} range={[0.8, 1]} />
           </motion.div>
         </div>
 
