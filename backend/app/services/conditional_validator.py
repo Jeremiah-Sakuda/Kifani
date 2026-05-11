@@ -1,7 +1,7 @@
 """
 FORGED — Conditional Language Validator
 
-Uses Gemini 2.0 Flash to validate and rewrite narratives ensuring
+Uses Gemini 2.5 Flash to validate and rewrite narratives ensuring
 compliant conditional language. All claims must use hedged phrasing
 ("could align with", "suggests", "may") rather than definitive claims
 ("you would be good at", "you are").
@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "gemini-2.0-flash-001"
+MODEL_NAME = "gemini-2.5-flash"
 
 VALIDATION_PROMPT = """You are a compliance validator for a sports fan engagement application.
 

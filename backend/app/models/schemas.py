@@ -35,7 +35,7 @@ class SecondaryArchetype(BaseModel):
 
 class ValidationTrace(BaseModel):
     """Exposed validation trace for transparency — Gemini auditing Gemini."""
-    model: str = "gemini-2.0-flash-001"
+    model: str = "gemini-2.5-flash"
     input_length: int
     output_length: int
     was_modified: bool
