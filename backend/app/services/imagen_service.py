@@ -147,7 +147,7 @@ async def generate_portrait(
 
         # Generate image using Imagen
         response = client.models.generate_images(
-            model="imagen-3.0-generate-001",
+            model="imagen-3.0-fast-generate-001",
             prompt=prompt,
             config=types.GenerateImagesConfig(
                 number_of_images=1,
@@ -177,7 +177,21 @@ async def generate_portrait(
 
     except Exception as e:
         import traceback
-        error_details = f"{type(e).__name__}: {str(e)}"
+        error_str = str(e)
+        
+        # Fallback to SVG placeholder if quota is exhausted
+        if "429" in error_str or "Quota" in error_str or "RESOURCE_EXHAUSTED" in error_str:
+            print(f"[IMAGEN QUOTA EXCEEDED] Falling back to SVG placeholder. Error: {error_str}")
+            placeholder_data_url = generate_placeholder_svg(archetype)
+            encoded = placeholder_data_url.split("base64,")[1]
+            return ImagenResult(
+                success=True,
+                image_base64=encoded,
+                mime_type="image/svg+xml",
+                prompt_used=prompt if 'prompt' in locals() else None,
+            )
+
+        error_details = f"{type(e).__name__}: {error_str}"
         print(f"[GEMINI IMAGE ERROR] {error_details}")
         print(f"[GEMINI IMAGE TRACEBACK] {traceback.format_exc()}")
         return ImagenResult(
