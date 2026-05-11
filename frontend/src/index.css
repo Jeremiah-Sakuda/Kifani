@@ -131,9 +131,11 @@ h3 {
   font-size: clamp(1.25rem, 3vw, 1.75rem);
 }
 
-p {
-  max-width: 65ch;
-}
+/* Constrain unstyled long-form prose for readability, but only when an
+   explicit max-width hasn't been set via utilities. The previous global
+   `p { max-width: 65ch }` rule was clipping paragraphs inside flex/grid
+   contexts (e.g. ConfidenceMeter explanation, archetype insight) and is
+   intentionally removed. The `prose` plugin handles long-form copy. */
 
 .font-display {
   font-family: var(--font-display);

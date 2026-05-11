@@ -121,22 +121,22 @@ export default function ConfidenceMeter({ confidence, showExplanation = true }: 
       </div>
 
       {/* Scale labels */}
-      <div className="mt-2 grid grid-cols-4 text-[10px] text-ash">
-        <span className="text-left">Uncertain</span>
-        <span className="text-center">Low</span>
-        <span className="text-center">Moderate</span>
-        <span className="text-right">High</span>
+      <div className="mt-2 flex w-full items-center justify-between text-[10px] leading-none text-ash">
+        <span>Uncertain</span>
+        <span>Low</span>
+        <span>Moderate</span>
+        <span>High</span>
       </div>
 
       {/* Explanation */}
       {showExplanation && (
         <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.5, duration: 0.4 }}
-          className="mt-4 overflow-hidden rounded-lg bg-forge-steel/40 p-3"
+          className="mt-4 rounded-lg bg-forge-steel/40 p-3"
         >
-          <p className="text-sm leading-relaxed text-smoke">
+          <p className="!max-w-none text-sm leading-relaxed text-smoke">
             {levelInfo.description}
           </p>
         </motion.div>

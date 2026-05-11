@@ -322,13 +322,13 @@ export default function Results() {
           {result.insight && (
             <motion.div
               variants={fadeUp}
-              className="mx-auto mt-6 max-w-2xl rounded-lg bg-gold-core/10 p-4"
+              className="mx-auto mt-6 max-w-2xl rounded-lg bg-gold-core/10 p-4 text-left"
             >
               <div className="flex items-start gap-3">
                 <svg className="mt-0.5 h-5 w-5 shrink-0 text-gold-core" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p className="text-sm text-gold-core/90">{result.insight}</p>
+                <p className="!max-w-none min-w-0 flex-1 text-sm leading-relaxed text-gold-core/90">{result.insight}</p>
               </div>
             </motion.div>
           )}
