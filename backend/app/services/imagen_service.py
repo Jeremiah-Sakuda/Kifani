@@ -1,7 +1,7 @@
 """
 FORGED — Portrait Generation Service
 
-Uses Gemini 2.0 Flash to generate stylized archetype portraits.
+Uses Gemini 2.5 Flash Image to generate stylized archetype portraits.
 Non-photorealistic, artistic representations of athletic archetypes.
 """
 
@@ -15,7 +15,7 @@ from google.genai import types
 
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "")
 LOCATION = os.getenv("GCP_LOCATION", "us-central1")
-MODEL_NAME = "gemini-2.0-flash-preview-image-generation"
+MODEL_NAME = "gemini-2.5-flash-image"
 
 # Archetype-specific prompt elements
 ARCHETYPE_STYLES: dict[str, dict[str, str]] = {
